@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ONTU-BF — Observatoire National des Transports Urbains du Burkina Faso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+:root{
+  --paper:#EDF0EE; --surface:#FFFFFF; --ink:#101A17; --ink-2:#33433E;
+  --mute:#66776F; --faint:#93A29B; --line:#DFE5E1; --line-2:#C9D3CD;
+  --vert:#0B6B58; --vert-d:#075143; --vert-l:#E4F0EC;
+  --or:#B07C0C; --or-l:#FBF2DE;
+  --rouge:#B03A2E; --rouge-l:#FAE9E6;
+  --bleu:#2C6E9B; --bleu-l:#E6F0F7;
+  --disp:'Archivo',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  --sh:0 1px 2px rgba(16,26,23,.05), 0 6px 18px -10px rgba(16,26,23,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select{font-family:inherit;cursor:pointer}
+::selection{background:rgba(11,107,88,.18)}
+.app{display:flex;min-height:100vh}
+
+/* ---------- Rail ---------- */
+.rail{width:236px;flex:none;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.mark{display:flex;gap:11px;align-items:center;padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+.mark .sq{width:38px;height:38px;flex:none;border-radius:3px;background:var(--vert);display:grid;place-items:center;position:relative}
+.mark .sq::after{content:"";position:absolute;right:-3px;bottom:-3px;width:14px;height:14px;background:var(--or);border-radius:2px}
+.mark .sq svg{width:21px;height:21px;position:relative;z-index:1}
+.mark h1{font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:-.4px;line-height:1}
+.mark p{font-size:10px;color:var(--faint);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;font-weight:500}
+.rail nav{padding:12px 10px;flex:1;overflow-y:auto}
+.rail .grp{font-size:9.5px;text-transform:uppercase;letter-spacing:1.1px;color:var(--faint);font-weight:600;padding:12px 10px 6px}
+.nv{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 11px;border:none;background:none;border-radius:4px;color:var(--ink-2);font-size:13.5px;font-weight:500;transition:.14s}
+.nv svg{width:17px;height:17px;flex:none;opacity:.6}
+.nv:hover{background:var(--paper)}
+.nv.on{background:var(--vert);color:#fff}
+.nv.on svg{opacity:1}
+.nv .cnt{margin-left:auto;font-family:var(--mono);font-size:10.5px;opacity:.7}
+.rail .foot{padding:14px 18px;border-top:1px solid var(--line);font-size:11px;color:var(--faint)}
+.rail .foot .l{display:flex;align-items:center;gap:7px;color:var(--vert);font-weight:600;margin-bottom:5px}
+.rail .foot .l i{width:7px;height:7px;border-radius:50%;background:var(--vert);font-style:normal}
+
+/* ---------- Head ---------- */
+.wrap{flex:1;min-width:0;display:flex;flex-direction:column}
+.head{padding:20px 26px 14px;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.head h2{font-family:var(--disp);font-size:23px;font-weight:700;letter-spacing:-.6px}
+.head p{font-size:12.5px;color:var(--mute);margin-top:3px;max-width:62ch}
+.head .sp{flex:1}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:6px 11px;border-radius:3px;border:1px solid var(--line-2);background:var(--surface);color:var(--mute);white-space:nowrap}
+.tag.warn{color:var(--or);background:var(--or-l);border-color:#EBD9A8}
+main{padding:0 26px 34px;display:flex;flex-direction:column;gap:16px}
+.view{display:none;flex-direction:column;gap:16px}
+.view.on{display:flex}
+
+/* ---------- Cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.ch{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ch h3{font-family:var(--disp);font-size:14px;font-weight:600;letter-spacing:-.2px}
+.ch .s{margin-left:auto;font-size:11px;color:var(--faint);font-weight:500}
+.cb{padding:16px}
+
+/* ---------- Bandeau fraîcheur (élément signature) ---------- */
+.fresh{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:14px 16px}
+.fresh .ft{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.fresh .ft h3{font-family:var(--disp);font-size:13.5px;font-weight:600}
+.fresh .ft .note{font-size:11.5px;color:var(--mute)}
+.fresh .ft .lg{margin-left:auto;display:flex;gap:12px;font-size:10.5px;color:var(--mute)}
+.fresh .ft .lg span{display:flex;align-items:center;gap:5px}
+.fresh .ft .lg i{width:9px;height:9px;border-radius:2px;font-style:normal}
+.ftrack{display:flex;gap:3px}
+.fcell{flex:1;min-width:0;border-radius:2px;padding:8px 7px;border:1px solid transparent;cursor:pointer;transition:.14s}
+.fcell:hover{transform:translateY(-2px)}
+.fcell .fk{font-size:10.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fcell .fd{font-family:var(--mono);font-size:9.5px;opacity:.75;margin-top:3px}
+.f-ok{background:var(--vert-l);color:var(--vert-d);border-color:#C6E2D8}
+.f-mid{background:var(--or-l);color:#7A5606;border-color:#EBD9A8}
+.f-old{background:var(--rouge-l);color:#7E2A21;border-color:#F0CFC9}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:14px 15px;position:relative}
+.kpi .k{font-size:11px;color:var(--mute);font-weight:500;display:flex;align-items:center;gap:7px}
+.kpi .k b{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 5px;border-radius:2px;letter-spacing:.3px}
+.kpi .v{font-family:var(--disp);font-size:27px;font-weight:700;letter-spacing:-1px;margin-top:9px;line-height:1;font-variant-numeric:tabular-nums}
+.kpi .v span{font-size:13px;color:var(--faint);font-weight:600;letter-spacing:0}
+.kpi .m{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:7px}
+.spark{margin-top:9px;height:26px;width:100%}
+
+/* ---------- Carte ---------- */
+.mapgrid{display:grid;grid-template-columns:1.65fr 1fr;gap:16px}
+#map{height:475px;background:var(--line)}
+.mapbox{position:relative}
+.mtool{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center;background:var(--surface)}
+.chip{font-size:11.5px;font-weight:600;padding:6px 10px;border:1px solid var(--line-2);background:var(--surface);color:var(--mute);border-radius:3px;transition:.14s}
+.chip:hover{border-color:var(--vert);color:var(--vert)}
+.chip.on{background:var(--vert);border-color:var(--vert);color:#fff}
+.mtool .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
+.mtool label{font-size:11.5px;color:var(--mute);display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
+.leg{position:absolute;left:12px;bottom:12px;z-index:600;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:4px;padding:10px 12px;backdrop-filter:blur(6px)}
+.leg .lt{font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--faint);font-weight:600;margin-bottom:7px}
+.leg .lr{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--mute);margin-top:4px;font-weight:500}
+.leg .sw{width:11px;height:11px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.mk-w{background:none!important;border:none!important}
+.mk{width:100%;height:100%;border-radius:50%;background:var(--c);border:2px solid #fff;box-shadow:0 2px 6px rgba(16,26,23,.4);transition:transform .15s}
+.mk:hover{transform:scale(1.2)}
+.mk.p1{border-color:var(--ink);border-width:2.5px}
+.mk.sel::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--c);animation:pl 1.8s ease-out infinite}
+@keyframes pl{0%{transform:scale(.65);opacity:.85}100%{transform:scale(1.5);opacity:0}}
+.tip{background:var(--ink);border:none;color:#fff;font-size:11.5px;font-weight:600;border-radius:3px;padding:5px 9px;box-shadow:0 6px 14px rgba(16,26,23,.3)}
+.tip::before{border-top-color:var(--ink)!important}
+.leaflet-container{font-family:var(--body)}
+.nomap{display:none;height:475px;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:repeating-linear-gradient(45deg,#E7EBE9,#E7EBE9 12px,#EDF0EE 12px,#EDF0EE 24px);color:var(--mute);font-size:13px;text-align:center;padding:24px}
+
+/* ---------- Fiche indicateur ---------- */
+.fiche .nm{font-family:var(--disp);font-size:21px;font-weight:700;letter-spacing:-.6px}
+.fiche .rg{font-size:12px;color:var(--mute);margin-top:2px}
+.bdg{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:3px;margin-top:11px;margin-right:5px}
+.meta{margin-top:14px;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.meta .mr{display:flex;gap:10px;padding:8px 11px;font-size:11.5px;border-bottom:1px solid var(--line)}
+.meta .mr:last-child{border-bottom:none}
+.meta .mk2{color:var(--faint);width:104px;flex:none;font-weight:500}
+.meta .mv{color:var(--ink-2);font-weight:500}
+.meta .mv.mono{font-family:var(--mono);font-size:11px}
+.gg{margin-top:13px}
+.gg .gl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mute);font-weight:500;margin-bottom:5px}
+.gg .gl b{color:var(--ink);font-family:var(--mono)}
+.tr{height:7px;background:var(--line);border-radius:4px;overflow:hidden}
+.fl{height:100%;border-radius:4px;transition:width .5s}
+.warnbox{margin-top:14px;background:var(--or-l);border:1px solid #EBD9A8;border-radius:4px;padding:10px 12px;font-size:11.5px;color:#7A5606;display:flex;gap:8px;line-height:1.45}
+.warnbox svg{width:14px;height:14px;flex:none;margin-top:1px}
+.dlrow{display:flex;gap:7px;margin-top:13px;flex-wrap:wrap}
+.dl{font-size:11.5px;font-weight:600;padding:7px 11px;border:1px solid var(--line-2);border-radius:3px;background:var(--surface);color:var(--ink-2);display:inline-flex;align-items:center;gap:6px;transition:.14s}
+.dl:hover{border-color:var(--vert);color:var(--vert);background:var(--vert-l)}
+.dl svg{width:13px;height:13px}
+
+/* ---------- Série ---------- */
+.serie{width:100%;height:150px}
+.slider{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.slider input[type=range]{flex:1;min-width:160px;accent-color:var(--vert)}
+.slider .yr{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--vert);min-width:46px}
+.slider .lb{font-size:11.5px;color:var(--mute);font-weight:500}
+.play{font-size:11.5px;font-weight:600;padding:6px 12px;border:1px solid var(--line-2);border-radius:3px;background:var(--surface);color:var(--ink-2)}
+.play:hover{border-color:var(--vert);color:var(--vert)}
+
+/* ---------- Table ---------- */
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);font-weight:600;text-align:right;padding:9px 12px;cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--line);user-select:none}
+thead th:first-child{text-align:left}
+thead th.act{color:var(--vert)}
+tbody td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+tbody td:first-child{text-align:left}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--paper)}
+tbody tr.sel{background:var(--vert-l)}
+.cn{display:flex;align-items:center;gap:9px;font-weight:600}
+.cn .d{width:9px;height:9px;border-radius:50%;flex:none}
+.cn .p{font-family:var(--mono);font-size:9px;padding:1px 4px;border-radius:2px;background:var(--ink);color:#fff;font-weight:700}
+.pill{display:inline-block;min-width:44px;font-family:var(--mono);font-size:11px;font-weight:500;padding:2px 7px;border-radius:2px;text-align:center}
+
+/* ---------- Catalogue ---------- */
+.cat{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.ds{border:1px solid var(--line);border-radius:4px;padding:14px 15px;background:var(--surface);display:flex;flex-direction:column;gap:9px}
+.ds h4{font-family:var(--disp);font-size:14px;font-weight:600}
+.ds .dd{font-size:12px;color:var(--mute);line-height:1.45}
+.ds .dt{display:flex;gap:6px;flex-wrap:wrap}
+.tg{font-family:var(--mono);font-size:9.5px;font-weight:500;padding:2px 6px;border-radius:2px;background:var(--paper);color:var(--mute);border:1px solid var(--line)}
+.tg.pub{background:var(--vert-l);color:var(--vert-d);border-color:#C6E2D8}
+.tg.res{background:var(--or-l);color:#7A5606;border-color:#EBD9A8}
+.tg.com{background:var(--bleu-l);color:#1F5476;border-color:#C7DCEA}
+.api{font-family:var(--mono);font-size:10.5px;background:var(--ink);color:#C9E7DD;padding:8px 10px;border-radius:3px;overflow-x:auto;white-space:nowrap}
+
+/* ---------- Comparateur ---------- */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cmp select{width:100%;padding:8px 10px;border:1px solid var(--line-2);border-radius:3px;font-size:13px;background:var(--surface);color:var(--ink)}
+.cmpbars{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.cb2{display:grid;grid-template-columns:118px 1fr 1fr;gap:9px;align-items:center}
+.cb2 .l{font-size:12px;color:var(--mute);font-weight:500}
+.cb2 .side{display:flex;align-items:center;gap:7px}
+.cb2 .bar{height:9px;border-radius:4px;flex:1}
+.cb2 .n{font-family:var(--mono);font-size:11.5px;min-width:56px}
+.cb2 .side.a{flex-direction:row-reverse}
+.cb2 .side.a .n{text-align:left}
+
+footer.pg{padding:16px 26px 30px;font-size:11px;color:var(--faint);border-top:1px solid var(--line);display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:6px}
+footer.pg b{color:var(--mute);font-weight:600}
+
+@media(max-width:1100px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .mapgrid{grid-template-columns:1fr}
+  .cat{grid-template-columns:1fr}
+  .ftrack{flex-wrap:wrap}
+  .fcell{min-width:110px}
+}
+@media(max-width:820px){
+  .app{flex-direction:column}
+  .rail{width:100%;height:auto;position:static;border-right:none;border-bottom:1px solid var(--line)}
+  .rail nav{display:flex;gap:4px;overflow-x:auto;padding:8px}
+  .rail .grp,.rail .foot{display:none}
+  .nv{white-space:nowrap;width:auto}
+  .nv .cnt{display:none}
+  .head,main,footer.pg{padding-left:16px;padding-right:16px}
+  .cmp{grid-template-columns:1fr}
+  #map,.nomap{height:360px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<aside class="rail">
+  <div class="mark">
+    <div class="sq"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18h16M7 18V9m5 9V5m5 13v-6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+    <div><h1>ONTU-BF</h1><p>Observatoire des transports urbains</p></div>
+  </div>
+  <nav id="nav">
+    <div class="grp">Consulter</div>
+    <button class="nv on" data-view="synthese"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="8" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Synthèse nationale</button>
+    <button class="nv" data-view="reseau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8 6h6a4 4 0 010 8h-4a4 4 0 000 8"/></svg>Réseau de transport</button>
+    <button class="nv" data-view="compare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v16M7 9L4 12l3 3M17 9l3 3-3 3"/></svg>Comparer deux villes</button>
+    <div class="grp">Réutiliser</div>
+    <button class="nv" data-view="donnees"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>Données ouvertes<span class="cnt">9</span></button>
+    <button class="nv" data-view="qualite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Fraîcheur &amp; méthode</button>
+  </nav>
+  <div class="foot">
+    <div class="l"><i></i>Palier 1 en service</div>
+    Ouagadougou · Bobo-Dioulasso · Koudougou<br>14 villes en attente de raccordement
+  </div>
+</aside>
+
+<div class="wrap">
+  <header class="head">
+    <div>
+      <h2 id="vtitle">Synthèse nationale</h2>
+      <p id="vsub">Indicateurs de mobilité des dix-sept chefs-lieux de région. Chaque valeur porte sa source, sa date de production et sa maille.</p>
+    </div>
+    <div class="sp"></div>
+    <span class="tag warn">Maquette · données simulées</span>
+    <span class="tag" id="tag-maj">—</span>
+  </header>
+
+  <main>
+
+    <!-- ============ SYNTHÈSE ============ -->
+    <section class="view on" id="v-synthese">
+
+      <div class="fresh">
+        <div class="ft">
+          <h3>Fraîcheur des indicateurs</h3>
+          <span class="note">Aucun chiffre n'est publié sans sa date de production.</span>
+          <span class="lg">
+            <span><i style="background:#0B6B58"></i>à jour</span>
+            <span><i style="background:#B07C0C"></i>à rafraîchir</span>
+            <span><i style="background:#B03A2E"></i>périmé</span>
+          </span>
+        </div>
+        <div class="ftrack" id="ftrack"></div>
+      </div>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="mapgrid">
+        <div class="card mapbox">
+          <div class="mtool" id="mtool"></div>
+          <div style="position:relative">
+            <div id="map"></div>
+            <div class="nomap" id="nomap">Fond de carte indisponible.<br>Les indicateurs et le classement restent consultables.</div>
+            <div class="leg" id="leg"></div>
+          </div>
+          <div class="slider">
+            <span class="lb">Année de référence</span>
+            <span class="yr" id="yr">2026</span>
+            <input type="range" id="range" min="2022" max="2026" step="1" value="2026" aria-label="Année de référence">
+            <button class="play" id="play">▶ Dérouler la série</button>
+          </div>
+        </div>
+
+        <div class="card fiche">
+          <div class="ch"><h3>Fiche indicateur</h3><span class="s" id="fiche-cls">—</span></div>
+          <div class="cb" id="fiche"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><h3>Classement des villes</h3><span class="s">Cliquez un en-tête pour trier, une ligne pour sélectionner</span></div>
+        <div class="cb" style="padding:0 6px 6px">
+          <table>
+            <thead><tr>
+              <th data-s="name">Ville</th>
+              <th data-s="palier">Palier</th>
+              <th data-s="deplacements">Déplacements/jour</th>
+              <th data-s="tc" class="act">Part transport collectif</th>
+              <th data-s="vitesse">Vitesse commerciale</th>
+              <th data-s="accidents">Accidents</th>
+              <th data-s="couverture">Couverture réseau</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RÉSEAU ============ -->
+    <section class="view" id="v-reseau">
+      <div class="card">
+        <div class="ch"><h3>Réseau décrit au format d'échange GTFS</h3><span class="s">Lignes conventionnées et transport artisanal</span></div>
+        <div class="cb" style="padding:14px 16px 0">
+          <p style="font-size:12.5px;color:var(--mute);max-width:80ch">
+            Le référentiel du réseau est publié dans un format standard, réutilisable par toute application tierce.
+            Les itinéraires artisanaux, sans horaires fixes, sont décrits par fréquences observées et par arrêts assortis d'un degré de stabilité.
+          </p>
+        </div>
+        <div class="mtool" id="rtool" style="border-top:1px solid var(--line);margin-top:14px"></div>
+        <div style="position:relative"><div id="map2" style="height:470px;background:var(--line)"></div></div>
+      </div>
+      <div class="cat" id="gtfsinfo"></div>
+    </section>
+
+    <!-- ============ COMPARER ============ -->
+    <section class="view" id="v-compare">
+      <div class="card">
+        <div class="ch"><h3>Comparer deux villes</h3><span class="s">Même méthode, même maille, même année</span></div>
+        <div class="cb">
+          <div class="cmp">
+            <div><label style="font-size:11px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.6px">Ville A</label><select id="selA"></select></div>
+            <div><label style="font-size:11px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.6px">Ville B</label><select id="selB"></select></div>
+          </div>
+          <div class="cmpbars" id="cmpbars"></div>
+          <div class="warnbox" style="margin-top:18px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.4"/></svg>
+            <span>Une comparaison n'a de sens que si les deux villes relèvent du même palier de collecte. Les villes du palier 2 sont renseignées par enquête ponctuelle, celles du palier 1 par mesure continue.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DONNÉES ============ -->
+    <section class="view" id="v-donnees">
+      <div class="card">
+        <div class="ch"><h3>Catalogue de données</h3><span class="s">Téléchargement immédiat · sans compte · formats ouverts</span></div>
+        <div class="cb"><div class="cat" id="catalogue"></div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><h3>Accès par interface applicative</h3><span class="s">Ressources exposées</span></div>
+        <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+          <p style="font-size:12.5px;color:var(--mute);max-width:82ch">Les mêmes données sont interrogeables par appel programmé. La version est portée dans le chemin ; une version reste servie douze mois après la publication de la suivante.</p>
+          <div class="api">GET /v1/indicateurs?territoire=BF-KAD&amp;periode=2026&amp;maille=commune</div>
+          <div class="api">GET /v1/reseaux/ouagadougou/gtfs.zip</div>
+          <div class="api">GET /v1/jeux-de-donnees?classification=public</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ QUALITÉ ============ -->
+    <section class="view" id="v-qualite">
+      <div class="card">
+        <div class="ch"><h3>Méthode de chaque indicateur</h3><span class="s">Ce que la valeur mesure, et ce qu'elle ne mesure pas</span></div>
+        <div class="cb"><div id="methodes" style="display:flex;flex-direction:column;gap:10px"></div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><h3>Protection des données</h3></div>
+        <div class="cb" style="font-size:12.5px;color:var(--ink-2);line-height:1.6;max-width:86ch">
+          Aucune donnée permettant d'identifier une personne ou un véhicule n'entre dans la plateforme. L'anonymisation est appliquée au moment de la collecte, avant tout enregistrement.
+          Les indicateurs diffusés sont des agrégats ; toute valeur portant sur un effectif inférieur au seuil minimal n'est pas publiée. Les données issues de l'institut national de la statistique
+          relèvent en outre du secret statistique, régime distinct qui peut interdire la diffusion d'un croisement même anonyme.
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="pg">
+    <b>ONTU-BF</b><span>·</span><span>Maquette de démonstration du Livrable 3 — les valeurs sont simulées</span><span>·</span>
+    <span>PMDUVS · Groupement IDIAWARE SARL / Data Transport · Financement Banque mondiale</span>
+  </footer>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ================= Données simulées ================= */
+const VILLES=[
+ {n:"Ouagadougou",r:"Centre",code:"BF-KAD",lat:12.371,lon:-1.519,pal:1,pop:2900000,dep:4120000,tc:31,vit:16,acc:1180,cov:74,art:62,stab:81},
+ {n:"Bobo-Dioulasso",r:"Hauts-Bassins",code:"BF-HBS",lat:11.178,lon:-4.297,pal:1,pop:1120000,dep:1480000,tc:22,vit:19,acc:412,cov:58,art:71,stab:66},
+ {n:"Koudougou",r:"Centre-Ouest",code:"BF-CRO",lat:12.252,lon:-2.362,pal:1,pop:160000,dep:212000,tc:11,vit:23,acc:96,cov:34,art:78,stab:52},
+ {n:"Ouahigouya",r:"Nord",code:"BF-NRD",lat:13.583,lon:-2.421,pal:2,pop:135000,dep:171000,tc:9,vit:24,acc:74,cov:28,art:80,stab:44},
+ {n:"Kaya",r:"Centre-Nord",code:"BF-CNR",lat:13.092,lon:-1.084,pal:2,pop:128000,dep:158000,tc:8,vit:24,acc:69,cov:26,art:82,stab:41},
+ {n:"Banfora",r:"Cascades",code:"BF-CAS",lat:10.633,lon:-4.762,pal:2,pop:117000,dep:142000,tc:8,vit:25,acc:52,cov:25,art:81,stab:43},
+ {n:"Tenkodogo",r:"Centre-Est",code:"BF-CES",lat:11.780,lon:-0.369,pal:2,pop:75000,dep:91000,tc:7,vit:26,acc:44,cov:21,art:84,stab:38},
+ {n:"Fada N'Gourma",r:"Est",code:"BF-EST",lat:12.061,lon:0.358,pal:2,pop:82000,dep:99000,tc:7,vit:25,acc:58,cov:22,art:83,stab:39},
+ {n:"Dédougou",r:"Boucle du Mouhoun",code:"BF-BMH",lat:12.463,lon:-3.460,pal:2,pop:72000,dep:87000,tc:6,vit:26,acc:47,cov:20,art:85,stab:37},
+ {n:"Dori",r:"Sahel",code:"BF-SHL",lat:14.033,lon:-0.033,pal:2,pop:68000,dep:79000,tc:5,vit:27,acc:31,cov:17,art:86,stab:33},
+ {n:"Gaoua",r:"Sud-Ouest",code:"BF-SOU",lat:10.297,lon:-3.183,pal:2,pop:52000,dep:61000,tc:5,vit:27,acc:26,cov:16,art:87,stab:32},
+ {n:"Ziniaré",r:"Plateau-Central",code:"BF-PCL",lat:12.581,lon:-1.297,pal:2,pop:41000,dep:53000,tc:6,vit:26,acc:29,cov:19,art:84,stab:36},
+ {n:"Manga",r:"Centre-Sud",code:"BF-CSD",lat:11.664,lon:-1.073,pal:2,pop:38000,dep:45000,tc:5,vit:27,acc:22,cov:15,art:86,stab:31},
+ {n:"Djibo",r:"Sahel (Soum)",code:"BF-SOM",lat:14.100,lon:-1.630,pal:2,pop:44000,dep:50000,tc:4,vit:28,acc:18,cov:12,art:88,stab:27},
+ {n:"Nouna",r:"Kossi",code:"BF-KOS",lat:12.729,lon:-3.863,pal:2,pop:36000,dep:42000,tc:4,vit:28,acc:20,cov:13,art:88,stab:29},
+ {n:"Léo",r:"Sissili",code:"BF-SIS",lat:11.100,lon:-2.100,pal:2,pop:39000,dep:46000,tc:5,vit:27,acc:21,cov:14,art:87,stab:30},
+ {n:"Pô",r:"Nahouri",code:"BF-NAH",lat:11.170,lon:-1.150,pal:2,pop:33000,dep:39000,tc:5,vit:27,acc:19,cov:14,art:86,stab:30},
+];
+
+/* Séries 2022→2026, déterministes */
+function serie(v,cle){
+  const base={dep:v.dep,tc:v.tc,vit:v.vit,acc:v.acc,cov:v.cov}[cle];
+  const pente={dep:.042,tc:.055,vit:-.021,acc:.028,cov:.085}[cle];
+  const bruit=(v.n.length%5)/100;
+  return [0,1,2,3,4].map(i=>{
+    const t=(i-4);
+    let x=base*(1+pente*t)+base*bruit*Math.sin(i+v.lat);
+    return cle==='tc'||cle==='cov'?Math.max(1,Math.round(x)):Math.round(x);
+  });
+}
+const ANNEES=[2022,2023,2024,2025,2026];
+VILLES.forEach(v=>{v.s={};['dep','tc','vit','acc','cov'].forEach(k=>v.s[k]=serie(v,k));});
+
+/* Indicateurs : métadonnées réelles du dispositif */
+const IND={
+ dep:{lab:"Déplacements par jour",court:"Déplacements",unite:"dépl./jour",maille:"Agglomération",src:"Enquête ménages INSD + comptages ONTU",prod:"2026-06",cls:"public",freq:"Annuelle",meth:"Nombre de déplacements tous modes, tous motifs, un jour ouvrable moyen. Redressement sur la population recensée. Exclut les déplacements de moins de 5 minutes à l'intérieur d'une même parcelle.",fmt:v=>v.toLocaleString('fr-FR'),max:4200000,inv:false},
+ tc:{lab:"Part du transport collectif",court:"Part TC",unite:"%",maille:"Agglomération",src:"SOTRACO (validations agrégées) + enquête ménages",prod:"2026-05",cls:"public",freq:"Trimestrielle",meth:"Part des déplacements motorisés réalisés en transport collectif conventionné ou artisanal. Les validations billettiques sont transmises agrégées par ligne, arrêt et plage horaire ; aucun titre individuel n'est transmis.",fmt:v=>v+" %",max:35,inv:false},
+ vit:{lab:"Vitesse commerciale",court:"Vitesse comm.",unite:"km/h",maille:"Ligne",src:"Positions véhicules SOTRACO, anonymisées à la collecte",prod:"2026-08",cls:"public",freq:"Mensuelle",meth:"Vitesse moyenne d'un véhicule de transport collectif sur sa ligne, arrêts compris, en heure de pointe du matin. Calculée sur agrégats de temps de parcours par tronçon ; aucune trace de véhicule identifié n'est conservée au-delà de deux mois.",fmt:v=>v+" km/h",max:30,inv:true},
+ acc:{lab:"Accidents corporels",court:"Accidents",unite:"cas/an",maille:"Commune",src:"ONASER — fichier accidents géolocalisé",prod:"2026-04",cls:"public",freq:"Mensuelle",meth:"Accidents de la circulation ayant fait au moins un blessé, déclarés et géolocalisés. Sous-déclaration probable dans les villes du palier 2, où le relevé dépend du poste de police.",fmt:v=>v.toLocaleString('fr-FR'),max:1200,inv:false},
+ cov:{lab:"Couverture du réseau décrit",court:"Couverture réseau",unite:"%",maille:"Agglomération",src:"Référentiel GTFS ONTU / OSM-BF",prod:"2026-07",cls:"public",freq:"Continue",meth:"Part des itinéraires de transport collectif effectivement relevés et publiés au format d'échange, rapportée aux itinéraires recensés. Un itinéraire n'est compté que si ses arrêts sont positionnés et son degré de stabilité renseigné.",fmt:v=>v+" %",max:100,inv:true},
+};
+
+/* Fraîcheur : dates de production hétérogènes, c'est le point */
+const FRAICHEUR=[
+ {k:"Vitesse commerciale",d:"2026-08"},{k:"Couverture réseau",d:"2026-07"},{k:"Déplacements/jour",d:"2026-06"},
+ {k:"Part transport collectif",d:"2026-05"},{k:"Accidents corporels",d:"2026-04"},{k:"Parc de véhicules",d:"2025-11"},
+ {k:"Coût du déplacement",d:"2025-03"},{k:"Enquête ménages",d:"2024-09"},{k:"Externalités",d:"2023-12"},
+];
+const AUJ=new Date(2026,7,23);
+function mois(d){const [y,m]=d.split('-').map(Number);return (AUJ.getFullYear()-y)*12+(AUJ.getMonth()+1-m);}
+
+/* Catalogue */
+const JEUX=[
+ {t:"Indicateurs de mobilité — 17 villes",d:"Les cinq indicateurs du référentiel national, par ville et par année, de 2022 à 2026.",tags:["CSV","JSON","public"],cls:"pub",cle:"indicateurs"},
+ {t:"Réseau de transport collectif — Ouagadougou",d:"Lignes, arrêts, fréquences observées et degré de stabilité, au format d'échange standard.",tags:["GTFS","GeoJSON","public"],cls:"pub",cle:"reseau"},
+ {t:"Accidents corporels géolocalisés",d:"Points d'accident agrégés à la maille du carrefour, seuil minimal de trois cas par maille.",tags:["CSV","GeoJSON","public"],cls:"pub",cle:"accidents"},
+ {t:"Points de comptage — relevés horaires",d:"Agrégats par pas de quinze minutes, par point fixe, sans identification de véhicule.",tags:["CSV","public"],cls:"pub",cle:"comptage"},
+ {t:"Fréquentation par ligne et par arrêt",d:"Validations agrégées transmises par l'opérateur. Accès nominatif au titre de la convention d'échange.",tags:["CSV","restreint"],cls:"res",cle:"frequentation"},
+ {t:"Matrices origine-destination par zone",d:"Matrices calculées chez l'opérateur télécom et transmises agrégées. Jeu valorisable sous licence.",tags:["CSV","commercialisable"],cls:"com",cle:"od"},
+];
+
+/* ================= Utilitaires ================= */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function couleur(t,inv){ // 0..1 -> rouge..vert (ou inverse)
+  let x=Math.max(0,Math.min(1,t)); if(!inv)x=1-x;
+  const st=[[176,58,46],[176,124,12],[11,107,88]];
+  const s=x<.5?0:1, l=x<.5?x/.5:(x-.5)/.5, a=st[s],b=st[s+1];
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*l)},${Math.round(a[1]+(b[1]-a[1])*l)},${Math.round(a[2]+(b[2]-a[2])*l)})`;
+}
+let indic='tc', annee=2026, sel=VILLES[0], tri='tc', sens=-1, couche={artisanal:true,conventionne:true,comptage:true};
+const val=(v,k,a)=>v.s[k][ANNEES.indexOf(a||annee)];
+
+/* ================= Fraîcheur ================= */
+function rendFraicheur(){
+  $('#ftrack').innerHTML=FRAICHEUR.map(f=>{
+    const m=mois(f.d), c=m<=6?'f-ok':m<=18?'f-mid':'f-old';
+    const [y,mm]=f.d.split('-');
+    const lib=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."][+mm-1];
+    return `<div class="fcell ${c}" title="Produit en ${lib} ${y} — ${m} mois">
+      <div class="fk">${f.k}</div><div class="fd">${lib} ${y} · ${m} m</div></div>`;
+  }).join('');
+  const rec=FRAICHEUR.reduce((a,b)=>mois(a.d)<mois(b.d)?a:b);
+  $('#tag-maj').textContent="Dernière mise à jour : "+rec.d.replace('-','/');
+}
+
+/* ================= KPI ================= */
+function rendKPI(){
+  const p1=VILLES.filter(v=>v.pal===1);
+  const totDep=VILLES.reduce((s,v)=>s+val(v,'dep'),0);
+  const tcMoy=Math.round(p1.reduce((s,v)=>s+val(v,'tc'),0)/p1.length);
+  const acc=VILLES.reduce((s,v)=>s+val(v,'acc'),0);
+  const cov=Math.round(VILLES.reduce((s,v)=>s+val(v,'cov'),0)/VILLES.length);
+  const data=[
+    {k:"Déplacements par jour",v:(totDep/1e6).toFixed(2).replace('.',','),u:" M",m:"17 villes · enquête + comptages",cls:"public",serie:ANNEES.map(a=>VILLES.reduce((s,v)=>s+val(v,'dep',a),0))},
+    {k:"Part du transport collectif",v:tcMoy,u:" %",m:"palier 1 seulement · non extrapolé",cls:"public",serie:ANNEES.map(a=>Math.round(p1.reduce((s,v)=>s+val(v,'tc',a),0)/p1.length))},
+    {k:"Accidents corporels",v:acc.toLocaleString('fr-FR'),m:"source ONASER · sous-déclaration palier 2",cls:"public",serie:ANNEES.map(a=>VILLES.reduce((s,v)=>s+val(v,'acc',a),0))},
+    {k:"Couverture du réseau décrit",v:cov,u:" %",m:"référentiel GTFS · mise à jour continue",cls:"public",serie:ANNEES.map(a=>Math.round(VILLES.reduce((s,v)=>s+val(v,'cov',a),0)/VILLES.length))},
+  ];
+  $('#kpis').innerHTML=data.map(d=>`
+    <div class="kpi">
+      <div class="k">${d.k} <b style="background:var(--vert-l);color:var(--vert-d)">PUBLIC</b></div>
+      <div class="v">${d.v}${d.u?`<span>${d.u}</span>`:''}</div>
+      ${sparkline(d.serie)}
+      <div class="m">${d.m}</div>
+    </div>`).join('');
+}
+function sparkline(s){
+  const w=190,h=26,mn=Math.min(...s),mx=Math.max(...s),r=(mx-mn)||1;
+  const pts=s.map((y,i)=>`${(i/(s.length-1)*w).toFixed(1)},${(h-((y-mn)/r)*(h-4)-2).toFixed(1)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <polyline points="${pts}" fill="none" stroke="var(--vert)" stroke-width="1.6" stroke-linejoin="round"/>
+    <circle cx="${w}" cy="${(h-((s[s.length-1]-mn)/r)*(h-4)-2).toFixed(1)}" r="2.4" fill="var(--or)"/></svg>`;
+}
+
+/* ================= Carte ================= */
+let map,couches,map2,ok=true;
+try{
+  map=L.map('map',{zoomControl:true}).setView([12.5,-1.9],6.3);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    {attribution:'© OpenStreetMap · © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+  couches=L.layerGroup().addTo(map);
+}catch(e){ok=false;$('#map').style.display='none';$('#nomap').style.display='flex';}
+
+function rendCarte(){
+  if(!ok)return;
+  couches.clearLayers();
+  const I=IND[indic];
+  VILLES.forEach(v=>{
+    const x=val(v,indic), c=couleur(x/I.max,I.inv);
+    const t=v.pal===1?22:14;
+    const html=`<div class="mk ${v===sel?'sel':''} ${v.pal===1?'p1':''}" style="--c:${c}"></div>`;
+    const m=L.marker([v.lat,v.lon],{icon:L.divIcon({html,className:'mk-w',iconSize:[t,t],iconAnchor:[t/2,t/2]})});
+    m.bindTooltip(`<b>${v.n}</b> · ${I.fmt(x)}<br><span style="opacity:.7;font-weight:400">${I.lab} · ${annee}</span>`,
+      {direction:'top',offset:[0,-t/2],className:'tip'});
+    m.on('click',()=>{sel=v;rendTout();map.panTo([v.lat,v.lon]);});
+    m.addTo(couches);
+  });
+}
+function rendLeg(){
+  const I=IND[indic];
+  $('#leg').innerHTML=`<div class="lt">${I.lab} — ${I.unite}</div>`+
+   [[0,'Faible'],[.5,'Moyen'],[1,'Élevé']].map(([t,l])=>
+     `<div class="lr"><span class="sw" style="background:${couleur(t,I.inv)}"></span>${l}</div>`).join('')+
+   `<div class="lr" style="margin-top:7px;padding-top:6px;border-top:1px solid var(--line)">
+      <span class="sw" style="background:var(--faint);border-color:var(--ink);border-width:2px"></span>Palier 1 · mesure continue</div>`;
+}
+function rendOutils(){
+  $('#mtool').innerHTML=Object.entries(IND).map(([k,v])=>
+    `<button class="chip ${k===indic?'on':''}" data-i="${k}">${v.court}</button>`).join('');
+  $$('#mtool .chip').forEach(b=>b.onclick=()=>{indic=b.dataset.i;tri=b.dataset.i;sens=-1;rendTout();});
+}
+
+/* ================= Fiche ================= */
+function rendFiche(){
+  const v=sel,I=IND[indic],x=val(v,indic);
+  const cls=VILLES.filter(a=>a.pal===v.pal).sort((a,b)=>val(b,indic)-val(a,indic));
+  const rang=cls.indexOf(v)+1;
+  $('#fiche-cls').textContent="Classification : public";
+  const s=v.s[indic];
+  const ev=s[4]-s[0], pc=s[0]?Math.round(ev/s[0]*100):0;
+  $('#fiche').innerHTML=`
+   <div class="nm">${v.n}</div>
+   <div class="rg">Région ${v.r} · code territoire <span style="font-family:var(--mono)">${v.code}</span></div>
+   <span class="bdg" style="background:${v.pal===1?'var(--vert-l)':'var(--paper)'};color:${v.pal===1?'var(--vert-d)':'var(--mute)'}">
+     ${v.pal===1?'Palier 1 · mesure continue':'Palier 2 · enquête ponctuelle'}</span>
+   <div class="gg">
+     <div class="gl"><span>${I.lab} — ${annee}</span><b>${I.fmt(x)}</b></div>
+     <div class="tr"><div class="fl" style="width:${Math.min(100,x/I.max*100)}%;background:${couleur(x/I.max,I.inv)}"></div></div>
+   </div>
+   ${courbe(s)}
+   <div class="meta">
+     <div class="mr"><span class="mk2">Rang</span><span class="mv">${rang} / ${cls.length} au sein du palier ${v.pal}</span></div>
+     <div class="mr"><span class="mk2">Évolution</span><span class="mv">${ev>0?'+':''}${pc} % entre 2022 et 2026</span></div>
+     <div class="mr"><span class="mk2">Maille</span><span class="mv">${I.maille}</span></div>
+     <div class="mr"><span class="mk2">Source</span><span class="mv">${I.src}</span></div>
+     <div class="mr"><span class="mk2">Produit en</span><span class="mv mono">${I.prod}</span></div>
+     <div class="mr"><span class="mk2">Fréquence</span><span class="mv">${I.freq}</span></div>
+   </div>
+   ${v.pal===2?`<div class="warnbox">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.4"/></svg>
+     <span>Ville du palier 2 : valeur reconstituée par enquête ponctuelle et non par mesure continue. À ne pas comparer directement à une ville du palier 1.</span></div>`:''}
+   <div class="dlrow">
+     <button class="dl" onclick="telecharger('ville')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>Série de cette ville (CSV)</button>
+     <button class="dl" onclick="telecharger('indicateurs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>Toutes les villes (CSV)</button>
+   </div>`;
+}
+function courbe(s){
+  const w=300,h=76,mn=Math.min(...s)*.94,mx=Math.max(...s)*1.04,r=(mx-mn)||1;
+  const X=i=>18+i/(s.length-1)*(w-30), Y=y=>h-14-((y-mn)/r)*(h-30);
+  const line=s.map((y,i)=>`${X(i).toFixed(1)},${Y(y).toFixed(1)}`).join(' ');
+  const aire=`18,${h-14} ${line} ${X(s.length-1)},${h-14}`;
+  const cur=ANNEES.indexOf(annee);
+  return `<svg class="serie" viewBox="0 0 ${w} ${h}" style="margin-top:12px">
+    <polygon points="${aire}" fill="rgba(11,107,88,.09)"/>
+    <polyline points="${line}" fill="none" stroke="var(--vert)" stroke-width="2" stroke-linejoin="round"/>
+    ${s.map((y,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(y).toFixed(1)}" r="${i===cur?4:2.6}"
+        fill="${i===cur?'var(--or)':'var(--vert)'}"/>`).join('')}
+    ${ANNEES.map((a,i)=>`<text x="${X(i).toFixed(1)}" y="${h-2}" text-anchor="middle"
+        font-family="JetBrains Mono" font-size="9" fill="${i===cur?'#B07C0C':'#93A29B'}">${a}</text>`).join('')}
+  </svg>`;
+}
+
+/* ================= Table ================= */
+function rendTable(){
+  const I=IND[indic];
+  const l=[...VILLES].sort((a,b)=>{
+    if(tri==='name')return sens*a.n.localeCompare(b.n);
+    if(tri==='palier')return sens*(a.pal-b.pal);
+    const k={deplacements:'dep',tc:'tc',vitesse:'vit',accidents:'acc',couverture:'cov'}[tri]||tri;
+    return sens*(val(a,k)-val(b,k));
+  });
+  $('#tbody').innerHTML=l.map(v=>{
+    const c=couleur(val(v,indic)/I.max,I.inv);
+    return `<tr data-n="${v.n}" class="${v===sel?'sel':''}">
+      <td><span class="cn"><span class="d" style="background:${c}"></span>${v.n}${v.pal===1?'<span class="p">P1</span>':''}</span></td>
+      <td>${v.pal}</td>
+      <td>${val(v,'dep').toLocaleString('fr-FR')}</td>
+      <td><span class="pill" style="background:${couleur(val(v,'tc')/35,false)}1f;color:${couleur(val(v,'tc')/35,false)}">${val(v,'tc')} %</span></td>
+      <td>${val(v,'vit')} km/h</td>
+      <td>${val(v,'acc').toLocaleString('fr-FR')}</td>
+      <td><span class="pill" style="background:${couleur(val(v,'cov')/100,true)}1f;color:${couleur(val(v,'cov')/100,true)}">${val(v,'cov')} %</span></td>
+    </tr>`;}).join('');
+  $$('#tbody tr').forEach(tr=>tr.onclick=()=>{sel=VILLES.find(v=>v.n===tr.dataset.n);rendTout();if(ok)map.panTo([sel.lat,sel.lon]);});
+  $$('thead th').forEach(th=>th.classList.toggle('act',th.dataset.s===tri));
+}
+
+/* ================= Réseau (carte 2) ================= */
+const LIGNES=[
+ {n:"Ligne 1 — Tampouy ↔ Zone du Bois",t:"conventionne",pts:[[12.408,-1.556],[12.395,-1.539],[12.375,-1.522],[12.362,-1.499],[12.356,-1.478]]},
+ {n:"Ligne 4 — Gounghin ↔ Ouaga 2000",t:"conventionne",pts:[[12.366,-1.549],[12.358,-1.531],[12.340,-1.512],[12.318,-1.497],[12.302,-1.488]]},
+ {n:"Ligne 8 — Dapoya ↔ Pissy",t:"conventionne",pts:[[12.390,-1.523],[12.378,-1.541],[12.365,-1.566],[12.352,-1.588],[12.345,-1.606]]},
+ {n:"Itinéraire artisanal A — Rood Woko ↔ Saaba",t:"artisanal",pts:[[12.372,-1.517],[12.380,-1.494],[12.386,-1.466],[12.392,-1.437],[12.398,-1.408]]},
+ {n:"Itinéraire artisanal B — Kossodo ↔ Centre",t:"artisanal",pts:[[12.421,-1.478],[12.404,-1.491],[12.389,-1.505],[12.376,-1.516]]},
+ {n:"Itinéraire artisanal C — Bonheur-Ville ↔ Gare",t:"artisanal",pts:[[12.330,-1.560],[12.345,-1.548],[12.358,-1.535],[12.370,-1.520]]},
+];
+const COMPTAGE=[[12.372,-1.518,"Rond-point des Nations unies"],[12.389,-1.531,"Avenue Kwame N'Krumah"],
+ [12.356,-1.500,"Boulevard Charles de Gaulle"],[12.401,-1.510,"Route de Kaya, PK3"],[12.348,-1.566,"Avenue Bassawarga"]];
+let map2ok=true;
+function initMap2(){
+  if(map2||!map2ok)return;
+  try{
+    map2=L.map('map2').setView([12.375,-1.515],12.4);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+      {attribution:'© OpenStreetMap · © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map2);
+    map2.lay=L.layerGroup().addTo(map2);
+    setTimeout(()=>map2.invalidateSize(),120);
+  }catch(e){map2ok=false;return;}
+  rendReseau();
+}
+function rendReseau(){
+  if(!map2)return;
+  map2.lay.clearLayers();
+  LIGNES.forEach(l=>{
+    if(!couche[l.t])return;
+    const conv=l.t==='conventionne';
+    L.polyline(l.pts,{color:conv?'#0B6B58':'#B07C0C',weight:conv?5:3.5,opacity:.9,
+      dashArray:conv?null:'7,6'}).bindTooltip(`<b>${l.n}</b><br><span style="opacity:.75;font-weight:400">${conv?'Ligne conventionnée · horaires publiés':'Transport artisanal · fréquence observée'}</span>`,{className:'tip',sticky:true}).addTo(map2.lay);
+    l.pts.forEach((p,i)=>{
+      L.circleMarker(p,{radius:conv?4.5:3.5,color:'#fff',weight:1.6,fillColor:conv?'#0B6B58':'#B07C0C',fillOpacity:1})
+       .bindTooltip(`Arrêt ${i+1} · ${conv?'position confirmée':'stabilité moyenne'}`,{className:'tip'}).addTo(map2.lay);
+    });
+  });
+  if(couche.comptage) COMPTAGE.forEach(([la,lo,n])=>{
+    L.marker([la,lo],{icon:L.divIcon({html:`<div class="mk" style="--c:#2C6E9B"></div>`,className:'mk-w',iconSize:[15,15],iconAnchor:[7.5,7.5]})})
+     .bindTooltip(`<b>Point de comptage</b><br><span style="opacity:.75;font-weight:400">${n} · agrégats 15 min</span>`,{className:'tip'}).addTo(map2.lay);
+  });
+}
+function rendRtool(){
+  $('#rtool').innerHTML=`
+    <button class="chip ${couche.conventionne?'on':''}" data-c="conventionne">Lignes conventionnées</button>
+    <button class="chip ${couche.artisanal?'on':''}" data-c="artisanal">Transport artisanal</button>
+    <button class="chip ${couche.comptage?'on':''}" data-c="comptage">Points de comptage</button>
+    <span class="sep"></span>
+    <span style="font-size:11.5px;color:var(--mute)">Ouagadougou · extrait du référentiel</span>`;
+  $$('#rtool .chip').forEach(b=>b.onclick=()=>{couche[b.dataset.c]=!couche[b.dataset.c];rendRtool();rendReseau();});
+  $('#gtfsinfo').innerHTML=`
+   <div class="ds"><h4>Pourquoi un format d'échange standard</h4>
+     <div class="dd">Décrire le réseau dans un format reconnu permet à n'importe quelle application tierce de l'utiliser sans convention préalable. C'est la condition pour que le travail de relevé serve au-delà de l'Observatoire.</div>
+     <div class="dt"><span class="tg">GTFS</span><span class="tg">GTFS-RT</span><span class="tg">SIRI</span><span class="tg pub">public</span></div></div>
+   <div class="ds"><h4>Le cas du transport artisanal</h4>
+     <div class="dd">Les itinéraires sans horaires fixes sont décrits par fréquences observées, avec pour chaque arrêt un degré de stabilité. Un arrêt utilisé tous les jours et un arrêt de saison sèche ne sont pas la même information.</div>
+     <div class="dt"><span class="tg">fréquences</span><span class="tg">degré de stabilité</span><span class="tg">variantes d'itinéraire</span></div>
+     <button class="dl" style="align-self:flex-start" onclick="telecharger('reseau')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>Extrait du référentiel (CSV)</button></div>`;
+}
+
+/* ================= Comparateur ================= */
+function initCmp(){
+  const opt=VILLES.map((v,i)=>`<option value="${i}">${v.n} — palier ${v.pal}</option>`).join('');
+  $('#selA').innerHTML=opt;$('#selB').innerHTML=opt;
+  $('#selA').value=0;$('#selB').value=1;
+  $('#selA').onchange=$('#selB').onchange=rendCmp;
+  rendCmp();
+}
+function rendCmp(){
+  const a=VILLES[+$('#selA').value], b=VILLES[+$('#selB').value];
+  $('#cmpbars').innerHTML=Object.entries(IND).map(([k,I])=>{
+    const va=val(a,k), vb=val(b,k), m=Math.max(va,vb)||1;
+    return `<div class="cb2">
+      <div class="side a"><div class="bar" style="width:${va/m*100}%;background:var(--vert)"></div><span class="n">${I.fmt(va)}</span></div>
+      <div class="l" style="text-align:center;grid-column:2">${I.lab}</div>
+      <div class="side"><div class="bar" style="width:${vb/m*100}%;background:var(--or)"></div><span class="n">${I.fmt(vb)}</span></div>
+    </div>`;
+  }).join('').replace(/grid-template-columns/g,'');
+  // en-tête
+  $('#cmpbars').insertAdjacentHTML('afterbegin',
+    `<div class="cb2" style="border-bottom:1px solid var(--line);padding-bottom:8px">
+      <div class="l" style="text-align:right;font-weight:600;color:var(--vert)">${a.n}</div>
+      <div class="l" style="text-align:center">année ${annee}</div>
+      <div class="l" style="font-weight:600;color:var(--or)">${b.n}</div></div>`);
+}
+
+/* ================= Catalogue ================= */
+function rendCat(){
+  $('#catalogue').innerHTML=JEUX.map(j=>`
+   <div class="ds">
+     <h4>${j.t}</h4>
+     <div class="dd">${j.d}</div>
+     <div class="dt">${j.tags.map(t=>`<span class="tg ${t==='public'?'pub':t==='restreint'?'res':t==='commercialisable'?'com':''}">${t}</span>`).join('')}</div>
+     <button class="dl" style="align-self:flex-start" onclick="telecharger('${j.cle}')">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>
+       ${j.cls==='pub'?'Télécharger':'Demander l\'accès'}</button>
+   </div>`).join('');
+  $('#methodes').innerHTML=Object.entries(IND).map(([k,I])=>`
+   <div style="border:1px solid var(--line);border-radius:4px;padding:12px 14px">
+     <div style="display:flex;gap:9px;align-items:baseline;flex-wrap:wrap">
+       <b style="font-family:var(--disp);font-size:13.5px">${I.lab}</b>
+       <span class="tg">${I.unite}</span><span class="tg">maille : ${I.maille}</span><span class="tg">produit en ${I.prod}</span>
+     </div>
+     <div style="font-size:12.5px;color:var(--mute);margin-top:7px;line-height:1.5">${I.meth}</div>
+   </div>`).join('');
+}
+
+/* ================= Téléchargement réel ================= */
+function csv(rows){return rows.map(r=>r.map(c=>{
+  const s=String(c);return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(';')).join('\n');}
+function fichier(nom,txt){
+  const b=new Blob(["\uFEFF"+txt],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nom;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+function telecharger(quoi){
+  if(quoi==='ville'){
+    const r=[["ville","code_territoire","palier","indicateur","annee","valeur","unite","source","produit_en"]];
+    Object.entries(IND).forEach(([k,I])=>ANNEES.forEach((a,i)=>
+      r.push([sel.n,sel.code,sel.pal,I.lab,a,sel.s[k][i],I.unite,I.src,I.prod])));
+    fichier(`ontubf_${sel.code}_indicateurs.csv`,csv(r));
+  }else if(quoi==='reseau'){
+    const r=[["ligne","type","ordre_arret","latitude","longitude","stabilite_arret"]];
+    LIGNES.forEach(l=>l.pts.forEach((p,i)=>r.push([l.n,l.t==='conventionne'?"conventionne":"artisanal",i+1,p[0],p[1],l.t==='conventionne'?"confirmee":"moyenne"])));
+    fichier('ontubf_reseau_ouagadougou.csv',csv(r));
+  }else if(quoi==='accidents'){
+    const r=[["ville","code_territoire","annee","accidents_corporels","source","seuil_minimal"]];
+    VILLES.forEach(v=>ANNEES.forEach((a,i)=>r.push([v.n,v.code,a,v.s.acc[i],"ONASER",3])));
+    fichier('ontubf_accidents.csv',csv(r));
+  }else if(quoi==='comptage'){
+    const r=[["point","latitude","longitude","pas_de_temps","vehicules_moyens"]];
+    COMPTAGE.forEach(([la,lo,n],i)=>r.push([n,la,lo,"15 min",320+i*47]));
+    fichier('ontubf_points_comptage.csv',csv(r));
+  }else if(quoi==='frequentation'||quoi==='od'){
+    alert("Jeu à accès restreint.\n\nDans la plateforme réelle, ce bouton ouvre une demande d'accès : motif d'usage, durée, et périmètre. L'accès accordé porte une date d'expiration obligatoire.");
+  }else{
+    const r=[["ville","code_territoire","region","palier",...Object.values(IND).map(I=>I.lab)]];
+    VILLES.forEach(v=>r.push([v.n,v.code,v.r,v.pal,...Object.keys(IND).map(k=>val(v,k))]));
+    r.push([]);r.push(["Année de référence",annee]);
+    r.push(["Avertissement","Valeurs simulées — maquette de démonstration du Livrable 3"]);
+    fichier(`ontubf_indicateurs_${annee}.csv`,csv(r));
+  }
+}
+
+/* ================= Navigation ================= */
+const TITRES={
+ synthese:["Synthèse nationale","Indicateurs de mobilité des dix-sept chefs-lieux de région. Chaque valeur porte sa source, sa date de production et sa maille."],
+ reseau:["Réseau de transport","Le référentiel des lignes et des arrêts, publié dans un format d'échange standard réutilisable sans convention."],
+ compare:["Comparer deux villes","La comparaison n'est valable qu'entre villes relevant du même mode de collecte."],
+ donnees:["Données ouvertes","Chaque jeu est téléchargeable immédiatement, dans un format ouvert, avec sa classification."],
+ qualite:["Fraîcheur et méthode","Ce que chaque indicateur mesure exactement, et les limites connues de sa production."],
+};
+$$('.nv').forEach(b=>b.onclick=()=>{
+  $$('.nv').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  const v=b.dataset.view;
+  $$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+  $('#vtitle').textContent=TITRES[v][0];$('#vsub').textContent=TITRES[v][1];
+  if(v==='reseau'){initMap2();setTimeout(()=>map2&&map2.invalidateSize(),150);}
+  if(v==='synthese'&&ok)setTimeout(()=>map.invalidateSize(),150);
+});
+
+/* ================= Année ================= */
+$('#range').oninput=e=>{annee=+e.target.value;$('#yr').textContent=annee;rendTout();};
+let timer=null;
+$('#play').onclick=()=>{
+  if(timer){clearInterval(timer);timer=null;$('#play').textContent="▶ Dérouler la série";return;}
+  $('#play').textContent="■ Arrêter";
+  let i=0;
+  timer=setInterval(()=>{
+    annee=ANNEES[i%5];$('#range').value=annee;$('#yr').textContent=annee;rendTout();i++;
+    if(i>10){clearInterval(timer);timer=null;$('#play').textContent="▶ Dérouler la série";}
+  },900);
+};
+$$('thead th').forEach(th=>th.onclick=()=>{
+  const k=th.dataset.s;if(tri===k)sens*=-1;else{tri=k;sens=(k==='name')?1:-1;}rendTable();});
+
+/* ================= Init ================= */
+function rendTout(){rendKPI();rendCarte();rendLeg();rendFiche();rendTable();if($('#v-compare').classList.contains('on'))rendCmp();}
+rendFraicheur();rendOutils();rendRtool();rendCat();initCmp();rendTout();
+window.telecharger=telecharger;
+if(ok)setTimeout(()=>map.invalidateSize(),250);
+</script>
+</body>
+</html>
