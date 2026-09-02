@@ -207,6 +207,105 @@ footer a:hover{color:var(--laterite)}
 .vue.on{display:block}
 @media(max-width:940px){.grille4,.grille3,.grille2{grid-template-columns:1fr}.prof{grid-template-columns:1fr}}
 
+
+/* ═══ vues différenciées par profil ═══ */
+/* décideur : visuel, peu de texte */
+.heroK{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:18px;margin-top:26px}
+.bigK{background:var(--nuit);color:#fff;padding:26px 28px}
+.bigK .l{font-size:14px;color:#9FAAA5}
+.bigK .v{font-family:var(--disp);font-size:58px;font-weight:800;line-height:1;margin-top:10px}
+.bigK .d{font-size:13.5px;color:#9FAAA5;margin-top:10px}
+.midK{background:var(--craie);border:1px solid var(--sable2);padding:20px 22px;display:flex;flex-direction:column;justify-content:space-between}
+.midK .l{font-size:13.5px;color:var(--gris)}
+.midK .v{font-family:var(--disp);font-size:34px;font-weight:700;line-height:1;margin-top:8px}
+.midK svg{margin-top:12px;width:100%;height:44px}
+.compar{margin-top:26px;background:var(--craie);border:1px solid var(--sable2);padding:24px}
+.cbar{display:grid;grid-template-columns:132px 1fr 60px;gap:14px;align-items:center;padding:9px 0}
+.cbar span:first-child{font-size:14.5px}
+.cbar .t{height:22px;background:var(--sable2);position:relative}
+.cbar .t i{position:absolute;inset:0 auto 0 0;background:var(--foret)}
+.cbar b{text-align:right;font-family:var(--disp);font-size:16px}
+.fil{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.fil button{border:1px solid var(--sable2);background:var(--craie);padding:7px 14px;font-size:13.5px}
+.fil button.on{background:var(--foret);color:#fff;border-color:var(--foret)}
+
+/* exploitant : console de supervision */
+.console{background:#0E1815;color:#D7DEDA;padding:20px 22px;margin-top:24px;font-size:14px}
+.console h4{font-family:var(--disp);color:#fff;font-size:16px;margin-bottom:14px}
+.pulse{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#26332E;margin-bottom:20px}
+.pulse div{background:#0E1815;padding:14px 16px}
+.pulse .l{font-size:12.5px;color:#8C948F}
+.pulse .v{font-family:var(--disp);font-size:26px;font-weight:700;margin-top:5px}
+.pulse .v.ok{color:#5FB07A}.pulse .v.al{color:#E0705A}.pulse .v.at{color:#D9A441}
+.flux{display:grid;grid-template-columns:60px 1fr 120px 90px;gap:12px;padding:9px 0;border-bottom:1px solid #1C2A25;font-size:13.5px;align-items:center}
+.flux:last-child{border:none}
+.dotf{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:8px}
+.queue{margin-top:24px}
+.qi{display:grid;grid-template-columns:8px 1fr 130px 118px;gap:14px;align-items:center;background:var(--craie);
+  border:1px solid var(--sable2);padding:14px 16px;margin-bottom:9px}
+.qi .bar{align-self:stretch;width:5px}
+.qi b{font-size:14.5px;display:block}
+.qi span{font-size:13px;color:var(--gris)}
+.eq{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:20px}
+.eqc{border:1px solid var(--sable2);background:var(--craie);padding:14px;text-align:center}
+.eqc .n{font-family:var(--disp);font-size:14px;font-weight:700}
+.eqc .p{font-family:var(--disp);font-size:22px;font-weight:700;margin-top:6px}
+.eqc .s{font-size:12px;margin-top:5px}
+
+/* analyste : outil de travail */
+.wk{display:grid;grid-template-columns:290px 1fr;gap:22px;margin-top:24px;align-items:start}
+.req{background:var(--craie);border:1px solid var(--sable2);padding:20px}
+.req label{display:block;font-size:12.5px;color:var(--gris);margin:14px 0 5px}
+.req select,.req input{width:100%;padding:9px 10px;border:1px solid var(--sable2);background:var(--sable);font-size:14px}
+.req .go{width:100%;margin-top:18px;background:var(--foret);color:#fff;border:none;padding:11px;font-size:14.5px;font-weight:500}
+.res{background:var(--craie);border:1px solid var(--sable2);padding:20px 22px}
+.res .rh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+.res .rh b{font-family:var(--disp);font-size:17px}
+.res .rh span{font-size:13px;color:var(--gris2)}
+
+/* producteur : guidé, simple */
+.etat{background:var(--craie);border:1px solid var(--sable2);border-left:5px solid var(--foret);
+  padding:22px 24px;margin-top:24px;display:flex;align-items:center;gap:20px}
+.etat .ic{width:48px;height:48px;flex:none;display:grid;place-items:center;background:#E4EFE6}
+.etat b{font-family:var(--disp);font-size:19px;display:block}
+.etat span{font-size:14.5px;color:var(--gris)}
+.tl{margin-top:24px;border-left:2px solid var(--sable2);padding-left:24px}
+.tl li{list-style:none;position:relative;padding-bottom:22px}
+.tl li::before{content:"";position:absolute;left:-30px;top:4px;width:11px;height:11px;border-radius:50%;
+  background:var(--craie);border:2px solid var(--foret)}
+.tl li.o::before{border-color:var(--or)}
+.tl li.r::before{border-color:var(--laterite)}
+.tl b{font-size:15px;display:block}
+.tl span{font-size:13.5px;color:var(--gris)}
+.corr{background:#FAF3E2;border:1px solid #E2D2A8;padding:20px 22px;margin-top:22px}
+.corr h4{font-family:var(--disp);font-size:16px;color:#7A5606;margin-bottom:12px}
+
+/* collectivité : territoire */
+.terr{display:grid;grid-template-columns:1fr 320px;gap:22px;margin-top:24px;align-items:start}
+#cartec{height:330px;border:1px solid var(--sable2)}
+.fiche{background:var(--craie);border:1px solid var(--sable2);padding:20px 22px}
+.fiche .li{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--sable2);font-size:14.5px}
+.fiche .li:last-child{border:none}
+.fiche .li b{font-family:var(--disp);font-size:16px}
+.manque{margin-top:22px}
+.mq{display:grid;grid-template-columns:14px 1fr 160px;gap:14px;align-items:center;
+  background:var(--craie);border:1px solid var(--sable2);padding:15px 17px;margin-bottom:9px}
+.mq i{width:14px;height:14px;border-radius:50%;display:block}
+
+/* administrateur : tables et journal */
+.matx{width:100%;border-collapse:collapse;font-size:14px;margin-top:20px;background:var(--craie)}
+.matx th{background:var(--nuit);color:#fff;font-family:var(--disp);font-weight:500;font-size:13px;padding:11px 12px;text-align:left}
+.matx td{padding:12px;border-bottom:1px solid var(--sable2)}
+.matx td:first-child{font-weight:600}
+.sw{display:inline-block;width:38px;height:20px;border-radius:10px;background:var(--sable2);position:relative;vertical-align:middle}
+.sw.on{background:var(--foret)}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.sw.on::after{left:20px}
+.stream{background:#0E1815;color:#B9C4BF;padding:18px 20px;margin-top:22px;font-size:13.5px;line-height:1.85}
+.stream b{color:#fff}
+.stream .t{color:#8C948F;margin-right:12px}
+@media(max-width:940px){.heroK,.wk,.terr{grid-template-columns:1fr}.pulse,.eq{grid-template-columns:repeat(2,1fr)}}
+
 @media(max-width:940px){
   nav{display:none}
   .burger{display:block;margin-left:auto}
@@ -735,236 +834,273 @@ const V={};
 
 V.decideur=[`
 <div class="atitre">Synthèse nationale</div>
-<p class="asous">Vue de lecture. Les valeurs présentées sont validées et publiées ; les valeurs en cours de contrôle n'y figurent pas.</p>
-<div class="grille4">
- <div class="kpi ok"><div class="k">Déplacements par jour</div><div class="v">6,97 M</div><div class="d">17 villes, juin 2026</div></div>
- <div class="kpi ok"><div class="k">Vitesse commerciale</div><div class="v">19,4</div><div class="d">km/h, en hausse de 0,8 sur un an</div></div>
- <div class="kpi alerte"><div class="k">Accidents corporels</div><div class="v">2 218</div><div class="d">cumul annuel, en hausse de 8 %</div></div>
- <div class="kpi attente"><div class="k">Couverture du référentiel</div><div class="v">25 %</div><div class="d">du réseau décrit</div></div>
+<p class="asous">Août 2026. Toutes les valeurs sont validées et publiées.</p>
+<div class="heroK">
+ <div class="bigK"><div class="l">Déplacements par jour, dix-sept villes</div><div class="v">6,97 M</div>
+  <div class="d">Enquête ménages de juin 2026, non extrapolé au-delà des villes couvertes</div></div>
+ <div class="midK"><div><div class="l">Vitesse commerciale</div><div class="v">19,4 km/h</div></div>
+  <svg viewBox="0 0 240 44"><polyline fill="none" stroke="#1F5641" stroke-width="2.5"
+   points="4,30 24,28 44,32 64,36 84,33 104,26 124,23 144,28 164,38 184,41 204,33 232,26"/>
+   <circle cx="232" cy="26" r="3.5" fill="#1F5641"/></svg></div>
+ <div class="midK"><div><div class="l">Accidents corporels</div><div class="v">2 218</div></div>
+  <svg viewBox="0 0 240 44"><polyline fill="none" stroke="#A8421F" stroke-width="2.5"
+   points="4,36 24,34 44,33 64,30 84,31 104,27 124,25 144,24 164,20 184,18 204,15 232,10"/>
+   <circle cx="232" cy="10" r="3.5" fill="#A8421F"/></svg></div>
 </div>
-<div class="bloc"><h4>Ce qui a changé depuis votre dernière consultation</h4>
-<div class="n">14 jours</div>
-<table class="tb"><tbody>
-<tr><td style="width:120px">2 sept.</td><td>La vitesse commerciale a été recalculée sur trois ans après révision de la méthode</td><td style="width:110px"><span class="et o">série révisée</span></td></tr>
-<tr><td>28 août</td><td>Ouverture du point de comptage 03, avenue de la Liberté</td><td><span class="et v">nouveau flux</span></td></tr>
-<tr><td>21 août</td><td>Les relevés de stationnement de Bobo-Dioulasso sont publiés</td><td><span class="et v">publié</span></td></tr>
-<tr><td>18 août</td><td>Le flux d'accidentologie n'a rien transmis depuis 34 jours</td><td><span class="et r">interrompu</span></td></tr>
-</tbody></table></div>`,
-`<div class="atitre">Comparaison des villes</div>
-<p class="asous">Les villes ne sont comparables que sur les indicateurs disposant de la même maille et de la même période. Les écarts de couverture sont signalés.</p>
-<div class="bloc"><h4>Vitesse commerciale et accidentologie</h4><div class="n">Août 2026</div>
-<table class="tb"><thead><tr><th>Ville</th><th>Vitesse</th><th>Accidents</th><th>Réseau décrit</th><th>Comparabilité</th></tr></thead><tbody>
-<tr><td>Ouagadougou</td><td>19,4 km/h</td><td>988</td><td>38 %</td><td><span class="et v">complète</span></td></tr>
-<tr><td>Bobo-Dioulasso</td><td>17,2 km/h</td><td>564</td><td>29 %</td><td><span class="et v">complète</span></td></tr>
-<tr><td>Koudougou</td><td>22,6 km/h</td><td>238</td><td>21 %</td><td><span class="et v">complète</span></td></tr>
-<tr><td>Ouahigouya</td><td>—</td><td>188</td><td>6 %</td><td><span class="et o">partielle</span></td></tr>
-<tr><td>Kaya</td><td>—</td><td>146</td><td>4 %</td><td><span class="et o">partielle</span></td></tr>
-<tr><td>Douze autres villes</td><td>—</td><td>94</td><td>0 %</td><td><span class="et g">hors palier 1</span></td></tr>
-</tbody></table></div>`,
+<div class="compar"><b style="font-family:var(--disp);font-size:17px">Vitesse commerciale par ville</b>
+ <p style="font-size:13.5px;color:var(--gris2);margin:5px 0 14px">Seules les villes disposant de la même maille et de la même période sont comparées</p>
+ <div class="cbar"><span>Koudougou</span><span class="t"><i style="width:92%"></i></span><b>22,6</b></div>
+ <div class="cbar"><span>Ouagadougou</span><span class="t"><i style="width:79%"></i></span><b>19,4</b></div>
+ <div class="cbar"><span>Bobo-Dioulasso</span><span class="t"><i style="width:70%"></i></span><b>17,2</b></div>
+ <div class="cbar"><span>Quatorze autres</span><span class="t"><i style="width:0%"></i></span><b>—</b></div>
+ <p style="font-size:13.5px;color:var(--gris);margin-top:14px">Les quatorze autres villes entrent au palier 2. Aucune valeur n'est estimée en leur absence.</p>
+</div>`,
+`<div class="atitre">Ce qui a changé</div>
+<p class="asous">Depuis votre dernière consultation, il y a quatorze jours.</p>
+<ul class="tl" style="margin-top:26px">
+ <li class="o"><b>La vitesse commerciale a été recalculée sur trois ans</b>
+  <span>La définition exclut désormais le temps d'attente au terminus. Les valeurs antérieures portent la mention « version 1 », les nouvelles « version 2 ». Les deux restent consultables.</span></li>
+ <li><b>Ouverture du point de comptage 03, avenue de la Liberté</b>
+  <span>Troisième point permanent de Ouagadougou. Premières valeurs publiables au bulletin d'octobre.</span></li>
+ <li><b>Les relevés de stationnement de Bobo-Dioulasso sont publiés</b>
+  <span>Centre-ville uniquement. Le reste de la commune reste non couvert.</span></li>
+ <li class="r"><b>Le flux d'accidentologie n'a rien transmis depuis 34 jours</b>
+  <span>Trois indicateurs du noyau prioritaire ne pourront pas être publiés à l'échéance de septembre. Escaladé à la tutelle.</span></li>
+</ul>`,
 `<div class="atitre">Alertes</div>
-<p class="asous">Seules les alertes de niveau élevé remontent à ce profil. Le traitement de premier niveau relève de l'exploitant.</p>
-<div class="bloc"><h4>Alertes ouvertes</h4><div class="n">2 alertes, aucune critique</div>
-<table class="tb"><tbody>
-<tr><td style="width:96px"><span class="et r">alerte</span></td><td><b>Flux d'accidentologie interrompu depuis 34 jours</b><br><span style="color:#5C6660">Trois indicateurs du noyau prioritaire ne pourront pas être publiés à l'échéance de septembre.</span></td><td style="width:150px">Escaladé à la tutelle</td></tr>
-<tr><td><span class="et o">attention</span></td><td><b>Aucun local identifié pour la salle de contrôle</b><br><span style="color:#5C6660">Jalon bloquant pour la commande des équipements d'affichage.</span></td><td>En attente d'arbitrage</td></tr>
-</tbody></table></div>`];
+<p class="asous">Seules les alertes de niveau élevé remontent à ce profil.</p>
+<div class="qi" style="margin-top:26px"><span class="bar" style="background:#A8421F"></span>
+ <div><b>Flux d'accidentologie interrompu depuis 34 jours</b><span>Trois indicateurs prioritaires deviennent non publiables à l'échéance</span></div>
+ <span style="font-size:13.5px">Escaladé à la tutelle</span><button class="act s">Voir le détail</button></div>
+<div class="qi"><span class="bar" style="background:#D99A0B"></span>
+ <div><b>Aménagement du local de la salle de contrôle non engagé</b><span>Jalon bloquant pour la commande des équipements d'affichage</span></div>
+ <span style="font-size:13.5px">En attente d'arbitrage</span><button class="act s">Voir le détail</button></div>`];
 
 V.exploitant=[`
 <div class="atitre">État des flux</div>
-<p class="asous">Onze flux déclarés. Le statut indique la dernière réception effective, non l'existence d'une convention.</p>
-<div class="grille4">
- <div class="kpi ok"><div class="k">Flux reçus ce jour</div><div class="v">7</div><div class="d">sur 8 attendus</div></div>
- <div class="kpi attente"><div class="k">Lots en quarantaine</div><div class="v">3</div><div class="d">à traiter sous 48 h</div></div>
- <div class="kpi alerte"><div class="k">Producteurs silencieux</div><div class="v">1</div><div class="d">au-delà de sa périodicité</div></div>
- <div class="kpi ok"><div class="k">Équipements en ligne</div><div class="v">46 / 48</div><div class="d">deux en maintenance</div></div>
-</div>
-<div class="bloc"><h4>Réceptions des dernières 24 heures</h4><div class="n">Heure de réception, volume et résultat du contrôle</div>
-<table class="tb"><thead><tr><th>Heure</th><th>Producteur</th><th>Jeu de données</th><th>Volume</th><th>Contrôle</th></tr></thead><tbody>
-<tr><td>00:04</td><td>SOTRACO</td><td>Positions de flotte</td><td>1,4 M lignes</td><td><span class="et v">accepté</span></td></tr>
-<tr><td>00:12</td><td>Équipements de comptage</td><td>Comptages horodatés</td><td>4 608 messages</td><td><span class="et v">accepté</span></td></tr>
-<tr><td>02:30</td><td>Police municipale</td><td>Infractions de stationnement</td><td>318 lignes</td><td><span class="et o">quarantaine</span></td></tr>
-<tr><td>06:00</td><td>CCVA</td><td>Visites techniques</td><td>2 044 lignes</td><td><span class="et v">accepté</span></td></tr>
-<tr><td>—</td><td>ONASER</td><td>Accidents de la circulation</td><td>—</td><td><span class="et r">non reçu</span></td></tr>
-</tbody></table></div>`,
+<p class="asous">Onze flux déclarés. Mardi 2 septembre, 10 h 47.</p>
+<div class="console">
+ <div class="pulse">
+  <div><div class="l">Flux reçus aujourd'hui</div><div class="v ok">7 / 8</div></div>
+  <div><div class="l">Lots en quarantaine</div><div class="v at">3</div></div>
+  <div><div class="l">Producteurs silencieux</div><div class="v al">1</div></div>
+  <div><div class="l">Équipements en ligne</div><div class="v ok">46 / 48</div></div>
+ </div>
+ <h4>Réceptions des dernières vingt-quatre heures</h4>
+ <div class="flux"><span style="color:#8C948F">00:04</span><span><i class="dotf" style="background:#5FB07A"></i>SOTRACO — positions de flotte</span><span>1,4 M lignes</span><span style="color:#5FB07A">accepté</span></div>
+ <div class="flux"><span style="color:#8C948F">00:12</span><span><i class="dotf" style="background:#5FB07A"></i>Équipements de comptage</span><span>4 608 messages</span><span style="color:#5FB07A">accepté</span></div>
+ <div class="flux"><span style="color:#8C948F">02:30</span><span><i class="dotf" style="background:#D9A441"></i>Police municipale — stationnement</span><span>318 lignes</span><span style="color:#D9A441">quarantaine</span></div>
+ <div class="flux"><span style="color:#8C948F">06:00</span><span><i class="dotf" style="background:#5FB07A"></i>CCVA — visites techniques</span><span>2 044 lignes</span><span style="color:#5FB07A">accepté</span></div>
+ <div class="flux"><span style="color:#8C948F">—</span><span><i class="dotf" style="background:#E0705A"></i>ONASER — accidents de la circulation</span><span>—</span><span style="color:#E0705A">non reçu</span></div>
+</div>`,
 `<div class="atitre">Alertes ouvertes</div>
-<p class="asous">Quatre niveaux : information, attention, alerte, critique. Chaque niveau a son destinataire et son délai.</p>
-<div class="bloc"><h4>À traiter</h4><div class="n">5 alertes</div>
-<table class="tb"><thead><tr><th>Niveau</th><th>Objet</th><th>Ouverte depuis</th><th>Délai</th><th></th></tr></thead><tbody>
-<tr><td><span class="et r">alerte</span></td><td>Flux ONASER interrompu depuis 34 jours</td><td>34 j</td><td>dépassé</td><td><button class="act s">Relancer</button></td></tr>
-<tr><td><span class="et o">attention</span></td><td>Lot Police municipale rejeté : trois champs obligatoires absents</td><td>6 h</td><td>2 j ouvrés</td><td><button class="act s">Voir le motif</button></td></tr>
-<tr><td><span class="et o">attention</span></td><td>Baisse de classification correcte sur la catégorie tricycle, point 01</td><td>2 j</td><td>2 j ouvrés</td><td><button class="act s">Examiner</button></td></tr>
-<tr><td><span class="et g">information</span></td><td>Équipement 12 hors ligne, avenue Kwame N'Krumah</td><td>9 h</td><td>1 j ouvré</td><td><button class="act s">Maintenance</button></td></tr>
-<tr><td><span class="et g">information</span></td><td>Charge inhabituelle au carrefour de l'Université, 7 h 15</td><td>3 h</td><td>1 j ouvré</td><td><button class="act s">Consigner</button></td></tr>
-</tbody></table></div>`,
+<p class="asous">Cinq alertes. Le niveau détermine le destinataire et le délai.</p>
+<div class="queue">
+ <div class="qi"><span class="bar" style="background:#A8421F"></span>
+  <div><b>Flux ONASER interrompu depuis 34 jours</b><span>niveau alerte · délai dépassé de 30 jours</span></div>
+  <span style="font-size:13.5px;color:#A8421F">délai dépassé</span><button class="act s">Relancer</button></div>
+ <div class="qi"><span class="bar" style="background:#D99A0B"></span>
+  <div><b>Lot Police municipale rejeté : trois champs obligatoires absents</b><span>niveau attention · ouvert depuis 6 h · délai 2 jours ouvrés</span></div>
+  <span style="font-size:13.5px">1 j 18 h restant</span><button class="act s">Voir le motif</button></div>
+ <div class="qi"><span class="bar" style="background:#D99A0B"></span>
+  <div><b>Baisse de classification correcte sur la catégorie tricycle, point 01</b><span>niveau attention · ouvert depuis 2 j</span></div>
+  <span style="font-size:13.5px">échéance ce jour</span><button class="act s">Examiner</button></div>
+ <div class="qi"><span class="bar" style="background:#8C948F"></span>
+  <div><b>Équipement 12 hors ligne, avenue Kwame N'Krumah</b><span>niveau information · ouvert depuis 9 h</span></div>
+  <span style="font-size:13.5px">3 h restantes</span><button class="act s">Maintenance</button></div>
+ <div class="qi"><span class="bar" style="background:#8C948F"></span>
+  <div><b>Charge inhabituelle au carrefour de l'Université, 7 h 15</b><span>niveau information · détecté automatiquement</span></div>
+  <span style="font-size:13.5px">à consigner</span><button class="act s">Consigner</button></div>
+</div>`,
 `<div class="atitre">Équipements</div>
-<p class="asous">Un équipement connecté n'est pas nécessairement un équipement qui produit correctement. Les deux états sont suivis séparément.</p>
-<div class="bloc"><h4>Points de comptage</h4><div class="n">48 équipements installés, trois villes</div>
-<table class="tb"><thead><tr><th>Point</th><th>Emplacement</th><th>Dernière transmission</th><th>Classification correcte</th><th>État</th></tr></thead><tbody>
-<tr><td>PC-01</td><td>Carrefour de l'Université, Ouagadougou</td><td>il y a 12 min</td><td>94 %</td><td><span class="et v">en service</span></td></tr>
-<tr><td>PC-02</td><td>Avenue Kwame N'Krumah, Ouagadougou</td><td>il y a 9 h</td><td>91 %</td><td><span class="et r">hors ligne</span></td></tr>
-<tr><td>PC-03</td><td>Avenue de la Liberté, Ouagadougou</td><td>il y a 14 min</td><td>88 %</td><td><span class="et o">à surveiller</span></td></tr>
-<tr><td>PC-04</td><td>Rond-point du Paysan, Bobo-Dioulasso</td><td>il y a 11 min</td><td>93 %</td><td><span class="et v">en service</span></td></tr>
-<tr><td>PC-05</td><td>Route de Banfora, Bobo-Dioulasso</td><td>il y a 13 min</td><td>76 %</td><td><span class="et o">dérive détectée</span></td></tr>
-</tbody></table></div>`];
+<p class="asous">Un équipement connecté n'est pas nécessairement un équipement qui produit juste. Les deux états sont suivis séparément.</p>
+<div class="eq">
+ <div class="eqc"><div class="n">PC-01</div><div class="p" style="color:#1F5641">94 %</div><div class="s" style="color:#1F5641">en service</div></div>
+ <div class="eqc"><div class="n">PC-02</div><div class="p" style="color:#A8421F">—</div><div class="s" style="color:#A8421F">hors ligne</div></div>
+ <div class="eqc"><div class="n">PC-03</div><div class="p" style="color:#D99A0B">88 %</div><div class="s" style="color:#D99A0B">à surveiller</div></div>
+ <div class="eqc"><div class="n">PC-04</div><div class="p" style="color:#1F5641">93 %</div><div class="s" style="color:#1F5641">en service</div></div>
+ <div class="eqc"><div class="n">PC-05</div><div class="p" style="color:#D99A0B">76 %</div><div class="s" style="color:#D99A0B">dérive détectée</div></div>
+ <div class="eqc"><div class="n">PC-06</div><div class="p" style="color:#1F5641">95 %</div><div class="s" style="color:#1F5641">en service</div></div>
+</div>
+<p style="font-size:14px;color:var(--gris);margin-top:18px">Le pourcentage est le taux de classification correcte, mesuré catégorie par catégorie sur un échantillon annoté. Le point 05 dérive sur la catégorie tricycle : un ré-entraînement est demandé.</p>`];
 
 V.analyste=[`
 <div class="atitre">Catalogue d'indicateurs</div>
-<p class="asous">140 indicateurs au portefeuille national, dont 24 au noyau prioritaire. Le niveau de calculabilité qualifie la chaîne méthodologique, non la disponibilité des données.</p>
-<div class="grille4">
- <div class="kpi"><div class="k">Portefeuille</div><div class="v">140</div><div class="d">indicateurs enregistrés</div></div>
- <div class="kpi ok"><div class="k">Noyau prioritaire</div><div class="v">24</div><div class="d">16 de niveau 1, 8 de niveau 2</div></div>
- <div class="kpi attente"><div class="k">Chaîne établie</div><div class="v">44</div><div class="d">faisabilité méthodologique</div></div>
- <div class="kpi"><div class="k">Produits en régulier</div><div class="v">0</div><div class="d">aucun au stade actuel</div></div>
-</div>
-<div class="bloc"><h4>Noyau prioritaire, extrait</h4><div class="n">Code, domaine, calculabilité, jeu de données principal</div>
-<table class="tb"><thead><tr><th>Code</th><th>Indicateur</th><th>Domaine</th><th>Calculabilité</th><th>Source principale</th></tr></thead><tbody>
+<p class="asous">140 indicateurs au portefeuille, 24 au noyau prioritaire.</p>
+<div class="fil"><button class="on">Tous</button><button>Noyau prioritaire</button><button>Chaîne établie</button><button>À consolider</button><button>Non instruits</button></div>
+<table class="matx"><thead><tr><th>Code</th><th>Indicateur</th><th>Domaine</th><th>Calculabilité</th><th>Source principale</th></tr></thead><tbody>
 <tr><td>CIRC 001</td><td>Temps de parcours par corridor et tranche horaire</td><td>Circulation</td><td><span class="et v">chaîne établie</span></td><td>Opérateurs privés</td></tr>
 <tr><td>TPUB 025</td><td>Vitesse commerciale par ligne et tranche horaire</td><td>Transport public</td><td><span class="et v">chaîne établie</span></td><td>Traces de flotte</td></tr>
 <tr><td>SECU 001</td><td>Accidents corporels par ville et par an</td><td>Sécurité routière</td><td><span class="et v">chaîne établie</span></td><td>ONASER</td></tr>
 <tr><td>ACCES 001</td><td>Population à moins de 500 m d'un arrêt</td><td>Accessibilité</td><td><span class="et o">à consolider</span></td><td>Référentiel arrêts</td></tr>
 <tr><td>SOCIO 003</td><td>Parts modales des déplacements</td><td>Socio-économie</td><td><span class="et v">chaîne établie</span></td><td>Enquête ménages</td></tr>
 <tr><td>ENV 008</td><td>Émissions estimées du secteur</td><td>Transversal</td><td><span class="et o">à consolider</span></td><td>Sources sectorielles</td></tr>
-</tbody></table></div>`,
+</tbody></table>`,
 `<div class="atitre">Exploration</div>
-<p class="asous">Accès en lecture au schéma d'analyse. Les données détaillées ne sont pas accessibles depuis ce profil ; les agrégats le sont.</p>
-<div class="grille2">
- <div class="bloc" style="margin-top:0"><h4>Vitesse commerciale par ligne</h4><div class="n">Ouagadougou, août 2026, heure de pointe du matin</div>
-  <svg class="mini" viewBox="0 0 640 220" role="img" aria-label="Vitesse par ligne">
-   <g stroke="#E8E1D6"><line x1="120" y1="20" x2="620" y2="20"/><line x1="120" y1="60" x2="620" y2="60"/><line x1="120" y1="100" x2="620" y2="100"/><line x1="120" y1="140" x2="620" y2="140"/><line x1="120" y1="180" x2="620" y2="180"/></g>
+<p class="asous">Lecture du schéma d'analyse. Les données détaillées ne sont pas accessibles depuis ce profil.</p>
+<div class="wk">
+ <div class="req">
+  <b style="font-family:var(--disp);font-size:16px">Construire une requête</b>
+  <label>Indicateur</label><select><option>TPUB 025 — Vitesse commerciale</option><option>CIRC 009 — Débit journalier moyen</option></select>
+  <label>Maille</label><select><option>Ligne</option><option>Tronçon</option><option>Ville</option></select>
+  <label>Période</label><input value="sept. 2025 → août 2026">
+  <label>Tranche horaire</label><select><option>Pointe du matin</option><option>Journée entière</option></select>
+  <label>Motif de l'extraction</label><input value="Rapport annuel 2026">
+  <button class="go">Exécuter</button>
+  <p style="font-size:12.5px;color:var(--gris2);margin-top:12px">Toute extraction est journalisée avec son auteur et son motif.</p>
+ </div>
+ <div class="res">
+  <div class="rh"><b>Vitesse commerciale par ligne — Ouagadougou</b><span>5 lignes · méthode v2 · calculé le 1er sept.</span></div>
+  <svg viewBox="0 0 640 230" style="width:100%;height:auto">
+   <g stroke="#E8E1D6"><line x1="130" y1="20" x2="620" y2="20"/><line x1="130" y1="62" x2="620" y2="62"/><line x1="130" y1="104" x2="620" y2="104"/><line x1="130" y1="146" x2="620" y2="146"/><line x1="130" y1="188" x2="620" y2="188"/></g>
    <g font-size="12.5" fill="#5C6660" font-family="Instrument Sans">
-    <text x="112" y="25" text-anchor="end">Ligne 4</text><text x="112" y="65" text-anchor="end">Ligne 7</text>
-    <text x="112" y="105" text-anchor="end">Ligne 12</text><text x="112" y="145" text-anchor="end">Ligne 15</text>
-    <text x="112" y="185" text-anchor="end">Ligne 21</text></g>
-   <g fill="#1F5641"><rect x="120" y="12" width="386" height="16"/><rect x="120" y="52" width="298" height="16"/>
-    <rect x="120" y="92" width="342" height="16"/><rect x="120" y="132" width="214" height="16"/><rect x="120" y="172" width="404" height="16"/></g>
+    <text x="122" y="25" text-anchor="end">Ligne 21</text><text x="122" y="67" text-anchor="end">Ligne 4</text>
+    <text x="122" y="109" text-anchor="end">Ligne 12</text><text x="122" y="151" text-anchor="end">Ligne 7</text>
+    <text x="122" y="193" text-anchor="end">Ligne 15</text></g>
+   <g fill="#1F5641"><rect x="130" y="12" width="404" height="16"/><rect x="130" y="54" width="386" height="16"/>
+    <rect x="130" y="96" width="342" height="16"/><rect x="130" y="138" width="298" height="16"/><rect x="130" y="180" width="214" height="16"/></g>
    <g font-size="12.5" fill="#131E1A" font-family="Instrument Sans" font-weight="600">
-    <text x="516" y="25">21,4</text><text x="428" y="65">16,8</text><text x="472" y="105">19,1</text><text x="344" y="145">12,2</text><text x="534" y="185">22,3</text></g>
-  </svg></div>
- <div class="bloc" style="margin-top:0"><h4>Requête</h4><div class="n">Trois paramètres suffisent à extraire une série</div>
-  <div class="champ"><label>Indicateur</label><input value="TPUB 025 — Vitesse commerciale"></div>
-  <div class="champ"><label>Maille</label><input value="Ligne"></div>
-  <div class="champ"><label>Période</label><input value="Septembre 2025 à août 2026"></div>
-  <div style="margin-top:18px;display:flex;gap:10px"><button class="act">Exécuter</button><button class="act s">Enregistrer</button></div>
-  <p style="font-size:13px;color:#8C948F;margin-top:14px">Toute extraction est journalisée avec son auteur et son motif.</p>
+    <text x="544" y="25">22,3</text><text x="526" y="67">21,4</text><text x="482" y="109">19,1</text><text x="438" y="151">16,8</text><text x="354" y="193">12,2</text></g>
+  </svg>
+  <div style="margin-top:18px;display:flex;gap:10px"><button class="act">Exporter en tableur</button><button class="act s">Exporter en CSV</button><button class="act s">Enregistrer la requête</button></div>
  </div>
 </div>`,
 `<div class="atitre">Exports</div>
-<p class="asous">Les extractions produites depuis ce profil portent la version de méthode en vigueur au moment du calcul.</p>
-<div class="bloc"><h4>Mes extractions</h4><div class="n">Conservées 30 jours</div>
-<table class="tb"><thead><tr><th>Extraction</th><th>Demandée</th><th>Volume</th><th>Version</th><th></th></tr></thead><tbody>
-<tr><td>Vitesse commerciale, 12 mois, toutes lignes</td><td>2 sept. 09:14</td><td>3 240 lignes</td><td>méthode v2</td><td><a class="lien" href="#">Télécharger</a></td></tr>
-<tr><td>Comptages PC-01, quart d'heure, août</td><td>1<sup>er</sup> sept. 16:02</td><td>2 976 lignes</td><td>—</td><td><a class="lien" href="#">Télécharger</a></td></tr>
-<tr><td>Accidents géolocalisés, 2025</td><td>28 août 11:37</td><td>1 964 lignes</td><td>méthode v1</td><td><a class="lien" href="#">Télécharger</a></td></tr>
-</tbody></table></div>`];
+<p class="asous">Chaque extraction porte la version de méthode en vigueur au moment du calcul. Conservation trente jours.</p>
+<table class="matx"><thead><tr><th>Extraction</th><th>Demandée</th><th>Volume</th><th>Version</th><th>Motif</th><th></th></tr></thead><tbody>
+<tr><td>Vitesse commerciale, 12 mois, toutes lignes</td><td>2 sept. 09:14</td><td>3 240 lignes</td><td>méthode v2</td><td>Rapport annuel</td><td><a class="dl" style="color:#1F5641" href="#">Télécharger</a></td></tr>
+<tr><td>Comptages PC-01, quart d'heure, août</td><td>1<sup>er</sup> sept. 16:02</td><td>2 976 lignes</td><td>—</td><td>Contrôle de dérive</td><td><a class="dl" style="color:#1F5641" href="#">Télécharger</a></td></tr>
+<tr><td>Accidents géolocalisés, 2025</td><td>28 août 11:37</td><td>1 964 lignes</td><td>méthode v1</td><td>Note points noirs</td><td><a class="dl" style="color:#1F5641" href="#">Télécharger</a></td></tr>
+</tbody></table>`];
 
 V.producteur=[`
 <div class="atitre">Mes transmissions</div>
-<p class="asous">Vous voyez ce que vous transmettez et ce qu'il en advient. Vous ne voyez pas les données des autres producteurs.</p>
-<div class="grille4">
- <div class="kpi ok"><div class="k">Reçues ce mois</div><div class="v">31 / 31</div><div class="d">aucune transmission manquée</div></div>
- <div class="kpi ok"><div class="k">Acceptées</div><div class="v">29</div><div class="d">après contrôle automatique</div></div>
- <div class="kpi attente"><div class="k">En quarantaine</div><div class="v">2</div><div class="d">à corriger de votre côté</div></div>
- <div class="kpi"><div class="k">Indicateurs alimentés</div><div class="v">6</div><div class="d">dont 4 au noyau prioritaire</div></div>
+<p class="asous">SOTRACO — service exploitation. Vous voyez vos transmissions et ce qu'il en advient.</p>
+<div class="etat">
+ <div class="ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#1F5641" stroke-width="2.4"><path d="M4 12l5 5L20 6"/></svg></div>
+ <div><b>Vous êtes à jour</b><span>31 transmissions attendues ce mois, 31 reçues. Un lot attend une correction de votre part.</span></div>
 </div>
-<div class="bloc"><h4>Dernières remises</h4><div class="n">Chaque remise porte son empreinte et son statut</div>
-<table class="tb"><thead><tr><th>Remise</th><th>Date</th><th>Volume</th><th>Statut</th></tr></thead><tbody>
-<tr><td>Positions de flotte, 1<sup>er</sup> sept.</td><td>2 sept. 00:04</td><td>1,4 M lignes</td><td><span class="et v">intégrée</span></td></tr>
-<tr><td>Positions de flotte, 31 août</td><td>1<sup>er</sup> sept. 00:06</td><td>1,4 M lignes</td><td><span class="et v">intégrée</span></td></tr>
-<tr><td>Validations billettique, août</td><td>1<sup>er</sup> sept. 08:20</td><td>412 880 lignes</td><td><span class="et o">quarantaine</span></td></tr>
-<tr><td>Programme d'exploitation, sept.</td><td>29 août 15:40</td><td>1 partition</td><td><span class="et v">intégrée</span></td></tr>
-</tbody></table></div>`,
+<ul class="tl" style="margin-top:26px">
+ <li><b>Positions de flotte du 1<sup>er</sup> septembre</b><span>Reçue le 2 sept. à 00:04 · 1,4 M lignes · intégrée</span></li>
+ <li><b>Positions de flotte du 31 août</b><span>Reçue le 1<sup>er</sup> sept. à 00:06 · 1,4 M lignes · intégrée</span></li>
+ <li class="o"><b>Validations billettique du mois d'août</b><span>Reçue le 1<sup>er</sup> sept. à 08:20 · 412 880 lignes · en quarantaine, trois contrôles ont échoué</span></li>
+ <li><b>Programme d'exploitation de septembre</b><span>Reçu le 29 août à 15:40 · intégré</span></li>
+</ul>`,
 `<div class="atitre">Anomalies à corriger</div>
-<p class="asous">Une anomalie ne bloque pas la suite : le lot est mis de côté et vous êtes informé du motif exact.</p>
-<div class="bloc"><h4>Lot en quarantaine</h4><div class="n">Validations billettique, août 2026</div>
-<table class="tb"><thead><tr><th>Contrôle</th><th>Constat</th><th>Lignes touchées</th><th>Action attendue</th></tr></thead><tbody>
-<tr><td>Champ obligatoire</td><td>La colonne d'identifiant d'arrêt est vide</td><td>3 412</td><td>Renseigner ou déclarer non applicable</td></tr>
-<tr><td>Rattachement</td><td>Douze identifiants d'arrêt ne correspondent à aucun objet du référentiel</td><td>8 906</td><td>Vérifier les codes, ou signaler des arrêts nouveaux</td></tr>
-<tr><td>Cohérence temporelle</td><td>Quatre validations portent un horodatage postérieur à la remise</td><td>4</td><td>Corriger l'horodatage</td></tr>
-</tbody></table>
-<div style="margin-top:18px;display:flex;gap:10px"><button class="act">Déposer un lot corrigé</button><button class="act s">Demander un appui</button></div></div>`,
+<p class="asous">Une anomalie ne bloque pas la suite. Le lot est mis de côté et vous recevez le motif exact.</p>
+<div class="corr">
+ <h4>Validations billettique, août 2026 — trois contrôles ont échoué</h4>
+ <table class="tb"><thead><tr><th>Contrôle</th><th>Constat</th><th>Lignes</th><th>Ce qu'il faut faire</th></tr></thead><tbody>
+ <tr><td>Champ obligatoire</td><td>La colonne d'identifiant d'arrêt est vide</td><td>3 412</td><td>Renseigner, ou déclarer non applicable</td></tr>
+ <tr><td>Rattachement</td><td>Douze identifiants ne correspondent à aucun arrêt du référentiel</td><td>8 906</td><td>Vérifier les codes, ou signaler des arrêts nouveaux</td></tr>
+ <tr><td>Cohérence temporelle</td><td>Quatre validations portent un horodatage postérieur à la remise</td><td>4</td><td>Corriger l'horodatage</td></tr>
+ </tbody></table>
+ <div style="margin-top:18px;display:flex;gap:10px"><button class="act">Déposer un lot corrigé</button><button class="act s">Demander un appui</button></div>
+</div>`,
 `<div class="atitre">Ce que mes données alimentent</div>
-<p class="asous">La contrepartie de la transmission : savoir à quoi elle sert et voir le résultat avant sa publication.</p>
-<div class="bloc"><h4>Indicateurs dépendant de vos jeux</h4><div class="n">Six indicateurs, dont quatre au noyau prioritaire</div>
-<table class="tb"><thead><tr><th>Indicateur</th><th>Votre contribution</th><th>Dernière valeur</th><th>Publication</th></tr></thead><tbody>
+<p class="asous">La contrepartie de la transmission : savoir à quoi elle sert.</p>
+<table class="matx"><thead><tr><th>Indicateur</th><th>Votre contribution</th><th>Dernière valeur</th><th>Publication</th></tr></thead><tbody>
 <tr><td>Vitesse commerciale par ligne</td><td>Traces de flotte</td><td>19,4 km/h</td><td><span class="et v">publié</span></td></tr>
 <tr><td>Fréquentation en voyages par jour</td><td>Validations billettique</td><td>—</td><td><span class="et o">en attente du lot corrigé</span></td></tr>
 <tr><td>Amplitude de service moyenne</td><td>Programme d'exploitation</td><td>15 h 40</td><td><span class="et v">publié</span></td></tr>
 <tr><td>Régularité aux arrêts</td><td>Traces de flotte</td><td>—</td><td><span class="et g">palier 2</span></td></tr>
-</tbody></table></div>`];
+</tbody></table>
+<p style="font-size:14px;color:var(--gris);margin-top:16px">Sans votre lot de validations, la fréquentation ne sera pas publiée au bulletin de septembre.</p>`];
 
 V.collectivite=[`
 <div class="atitre">Mon territoire</div>
-<p class="asous">Commune de Bobo-Dioulasso. Vous voyez les données de votre périmètre et les indicateurs nationaux publiés.</p>
-<div class="grille4">
- <div class="kpi ok"><div class="k">Vitesse commerciale</div><div class="v">17,2</div><div class="d">km/h, en baisse de 0,4</div></div>
- <div class="kpi alerte"><div class="k">Accidents corporels</div><div class="v">564</div><div class="d">cumul annuel</div></div>
- <div class="kpi attente"><div class="k">Réseau décrit</div><div class="v">29 %</div><div class="d">de la voirie communale</div></div>
- <div class="kpi ok"><div class="k">Points de comptage</div><div class="v">12</div><div class="d">deux installés ce mois</div></div>
+<p class="asous">Commune de Bobo-Dioulasso.</p>
+<div class="terr">
+ <div id="cartec"></div>
+ <div>
+  <div class="fiche">
+   <b style="font-family:var(--disp);font-size:17px">En un coup d'œil</b>
+   <div class="li" style="margin-top:12px"><span>Vitesse commerciale</span><b>17,2 km/h</b></div>
+   <div class="li"><span>Accidents corporels</span><b>564</b></div>
+   <div class="li"><span>Réseau décrit</span><b>29 %</b></div>
+   <div class="li"><span>Points de comptage</span><b>12</b></div>
+   <div class="li"><span>Arrêts référencés</span><b>184</b></div>
+  </div>
+  <div style="margin-top:16px"><button class="act" style="width:100%">Signaler une erreur</button></div>
+ </div>
 </div>
-<div class="bloc"><h4>Ce qui manque sur votre territoire</h4><div class="n">Les lacunes sont signalées plutôt que masquées</div>
-<table class="tb"><tbody>
-<tr><td style="width:180px"><span class="et o">à compléter</span></td><td>Le référentiel des arrêts du transport artisanal couvre 4 secteurs sur 25</td><td style="width:170px"><button class="act s">Organiser un relevé</button></td></tr>
-<tr><td><span class="et o">à compléter</span></td><td>Aucun relevé de stationnement au-delà du centre-ville</td><td><button class="act s">Organiser un relevé</button></td></tr>
-<tr><td><span class="et r">absent</span></td><td>Aucune donnée de fréquentation du transport artisanal</td><td><button class="act s">Nous écrire</button></td></tr>
-</tbody></table></div>`,
+<div class="manque">
+ <b style="font-family:var(--disp);font-size:17px">Ce qui manque sur votre territoire</b>
+ <p style="font-size:13.5px;color:var(--gris2);margin:5px 0 14px">Les lacunes sont signalées plutôt que masquées</p>
+ <div class="mq"><i style="background:#D99A0B"></i><span>Le référentiel des arrêts du transport artisanal couvre 4 secteurs sur 25</span><button class="act s">Organiser un relevé</button></div>
+ <div class="mq"><i style="background:#D99A0B"></i><span>Aucun relevé de stationnement au-delà du centre-ville</span><button class="act s">Organiser un relevé</button></div>
+ <div class="mq"><i style="background:#A8421F"></i><span>Aucune donnée de fréquentation du transport artisanal</span><button class="act s">Nous écrire</button></div>
+</div>`,
 `<div class="atitre">Signaler</div>
-<p class="asous">Un signalement ne modifie pas la donnée : il ouvre une vérification. La correction reste soumise au contrôle de l'Observatoire.</p>
-<div class="bloc"><h4>Nouveau signalement</h4><div class="n">Sur un objet du référentiel ou sur une valeur publiée</div>
-<div class="champ"><label>Objet concerné</label><input value="Arrêt — Marché de Bobo, secteur 3"></div>
-<div class="champ"><label>Nature du signalement</label><input value="L'arrêt a été déplacé de 80 mètres après les travaux"></div>
-<div class="champ"><label>Pièce jointe</label><input value="photo-arret-marche.jpg"></div>
-<div style="margin-top:18px"><button class="act">Envoyer le signalement</button></div></div>
-<div class="bloc"><h4>Mes signalements</h4><div class="n">Trois en cours</div>
-<table class="tb"><tbody>
-<tr><td style="width:120px">21 août</td><td>Ligne 3 : itinéraire modifié depuis la fermeture de l'avenue</td><td style="width:140px"><span class="et v">pris en compte</span></td></tr>
-<tr><td>14 août</td><td>Zone de stationnement du marché : capacité erronée</td><td><span class="et o">en vérification</span></td></tr>
-<tr><td>2 août</td><td>Deux arrêts manquants sur la route de Banfora</td><td><span class="et v">intégré</span></td></tr>
-</tbody></table></div>`,
+<p class="asous">Un signalement n'écrase pas la donnée : il ouvre une vérification.</p>
+<div class="wk">
+ <div class="req">
+  <b style="font-family:var(--disp);font-size:16px">Nouveau signalement</b>
+  <label>Objet concerné</label><input value="Arrêt — Marché de Bobo, secteur 3">
+  <label>Nature</label><select><option>L'objet a été déplacé</option><option>Le nom est erroné</option><option>L'objet n'existe plus</option><option>Un objet manque</option></select>
+  <label>Précision</label><input value="Déplacé de 80 mètres après les travaux">
+  <label>Photographie</label><input value="photo-arret-marche.jpg">
+  <button class="go">Envoyer</button>
+ </div>
+ <div class="res">
+  <div class="rh"><b>Mes signalements</b><span>3 en cours</span></div>
+  <ul class="tl" style="margin-top:6px">
+   <li><b>Ligne 3 : itinéraire modifié depuis la fermeture de l'avenue</b><span>21 août · pris en compte, référentiel mis à jour le 26 août</span></li>
+   <li class="o"><b>Zone de stationnement du marché : capacité erronée</b><span>14 août · en vérification par un agent de l'Observatoire</span></li>
+   <li><b>Deux arrêts manquants sur la route de Banfora</b><span>2 août · intégré</span></li>
+  </ul>
+ </div>
+</div>`,
 `<div class="atitre">Contribuer au référentiel</div>
-<p class="asous">Vos agents peuvent relever directement sur le terrain. Leur relevé entre en quarantaine et est validé par l'Observatoire.</p>
-<div class="bloc"><h4>Campagnes ouvertes</h4><div class="n">Deux campagnes vous concernent</div>
-<table class="tb"><thead><tr><th>Campagne</th><th>Objet</th><th>Avancement</th><th></th></tr></thead><tbody>
-<tr><td>Arrêts du transport artisanal</td><td>Relever position, nom d'usage et équipement</td><td>4 secteurs sur 25</td><td><button class="act s">Voir le protocole</button></td></tr>
-<tr><td>Inventaire du stationnement</td><td>Capacité, statut et tarification</td><td>Centre-ville terminé</td><td><button class="act s">Voir le protocole</button></td></tr>
-</tbody></table>
-<p style="font-size:14px;color:#5C6660;margin-top:16px">L'application de collecte fonctionne sans connexion : le référentiel est téléchargé avant la mission et les relevés se synchronisent au retour.</p>
-<div style="margin-top:14px"><a class="act" href="mobile.html" style="display:inline-block">Ouvrir l'application de collecte</a></div></div>`];
+<p class="asous">Vos agents peuvent relever directement. Leur relevé entre en quarantaine et est validé par l'Observatoire.</p>
+<div class="qi" style="margin-top:24px"><span class="bar" style="background:#1F5641"></span>
+ <div><b>Arrêts du transport artisanal</b><span>Relever position, nom d'usage et équipement · 4 secteurs sur 25 achevés</span></div>
+ <span style="font-size:13.5px">campagne ouverte</span><button class="act s">Voir le protocole</button></div>
+<div class="qi"><span class="bar" style="background:#1F5641"></span>
+ <div><b>Inventaire du stationnement</b><span>Capacité, statut et tarification · centre-ville achevé</span></div>
+ <span style="font-size:13.5px">campagne ouverte</span><button class="act s">Voir le protocole</button></div>
+<div class="etat" style="border-left-color:#D99A0B">
+ <div class="ic" style="background:#FAF3E2"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#B07C0C" stroke-width="2.2"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="10" y1="18" x2="14" y2="18"/></svg></div>
+ <div><b>L'application fonctionne sans connexion</b><span>Le référentiel est téléchargé avant la mission, les relevés se synchronisent au retour.</span>
+  <div style="margin-top:12px"><a class="act" href="mobile.html" style="display:inline-block">Ouvrir l'application de collecte</a></div></div>
+</div>`];
 
 V.admin=[`
 <div class="atitre">Comptes et habilitations</div>
-<p class="asous">Une habilitation porte un périmètre et une échéance. Sans échéance, elle serait reconduite tacitement et jamais réexaminée.</p>
-<div class="grille4">
- <div class="kpi"><div class="k">Comptes actifs</div><div class="v">64</div><div class="d">dont 11 producteurs</div></div>
- <div class="kpi attente"><div class="k">Habilitations à échéance</div><div class="v">7</div><div class="d">dans les 30 jours</div></div>
- <div class="kpi alerte"><div class="k">Comptes inactifs</div><div class="v">3</div><div class="d">plus de 90 jours sans connexion</div></div>
- <div class="kpi ok"><div class="k">Second facteur actif</div><div class="v">100 %</div><div class="d">sur les accès non publics</div></div>
+<p class="asous">Une habilitation porte un périmètre et une échéance. Sans échéance, elle serait reconduite sans jamais être réexaminée.</p>
+<div class="pulse" style="margin-top:24px;background:var(--sable2)">
+ <div style="background:var(--craie)"><div class="l" style="color:var(--gris)">Comptes actifs</div><div class="v" style="color:var(--nuit)">64</div></div>
+ <div style="background:var(--craie)"><div class="l" style="color:var(--gris)">À échéance sous 30 j</div><div class="v" style="color:#B07C0C">7</div></div>
+ <div style="background:var(--craie)"><div class="l" style="color:var(--gris)">Inactifs depuis 90 j</div><div class="v" style="color:#A8421F">3</div></div>
+ <div style="background:var(--craie)"><div class="l" style="color:var(--gris)">Second facteur actif</div><div class="v" style="color:#1F5641">100 %</div></div>
 </div>
-<div class="bloc"><h4>Habilitations arrivant à échéance</h4><div class="n">Le renouvellement est une décision, pas une reconduction</div>
-<table class="tb"><thead><tr><th>Compte</th><th>Profil</th><th>Périmètre</th><th>Échéance</th><th></th></tr></thead><tbody>
-<tr><td>a.sawadogo</td><td>Analyste</td><td>National</td><td>dans 8 jours</td><td><button class="act s">Renouveler</button></td></tr>
-<tr><td>service-technique-bobo</td><td>Collectivité</td><td>Bobo-Dioulasso</td><td>dans 14 jours</td><td><button class="act s">Renouveler</button></td></tr>
-<tr><td>etudiant-2026-014</td><td>Contributeur</td><td>Campagne arrêts</td><td>dans 21 jours</td><td><button class="act s">Renouveler</button></td></tr>
-</tbody></table></div>`,
+<table class="matx"><thead><tr><th>Compte</th><th>Profil</th><th>Périmètre</th><th>Échéance</th><th>Second facteur</th><th></th></tr></thead><tbody>
+<tr><td>a.sawadogo</td><td>Analyste</td><td>National</td><td style="color:#B07C0C">dans 8 jours</td><td><span class="sw on"></span></td><td><button class="act s">Renouveler</button></td></tr>
+<tr><td>service-technique-bobo</td><td>Collectivité</td><td>Bobo-Dioulasso</td><td style="color:#B07C0C">dans 14 jours</td><td><span class="sw on"></span></td><td><button class="act s">Renouveler</button></td></tr>
+<tr><td>etudiant-2026-014</td><td>Contributeur</td><td>Campagne arrêts</td><td>dans 21 jours</td><td><span class="sw"></span></td><td><button class="act s">Renouveler</button></td></tr>
+<tr><td>sotraco-exploitation</td><td>Producteur</td><td>Ses propres jeux</td><td>dans 6 mois</td><td><span class="sw on"></span></td><td><button class="act s">Modifier</button></td></tr>
+</tbody></table>`,
 `<div class="atitre">Classification des jeux</div>
-<p class="asous">L'administrateur applique les décisions, il ne les prend pas. La classification d'un jeu appartient à la structure qui en est propriétaire.</p>
-<div class="bloc"><h4>Jeux de données et décision de publication</h4><div class="n">La colonne de droite indique qui décide</div>
-<table class="tb"><thead><tr><th>Jeu de données</th><th>Classification</th><th>Propriétaire</th><th>Décision</th></tr></thead><tbody>
-<tr><td>Référentiel du réseau</td><td><span class="et v">public</span></td><td>Observatoire</td><td>Modifiable ici</td></tr>
-<tr><td>Comptages de circulation</td><td><span class="et v">public</span></td><td>Observatoire</td><td>Modifiable ici</td></tr>
-<tr><td>Accidents de la circulation</td><td><span class="et o">restreint</span></td><td>ONASER</td><td>Décision du propriétaire</td></tr>
-<tr><td>Validations billettique</td><td><span class="et r">sensible</span></td><td>SOTRACO</td><td>Décision du propriétaire</td></tr>
-<tr><td>Infractions de stationnement</td><td><span class="et o">restreint</span></td><td>Police municipale</td><td>Décision du propriétaire</td></tr>
+<p class="asous">L'administrateur applique les décisions, il ne les prend pas. La classification appartient à la structure propriétaire.</p>
+<table class="matx"><thead><tr><th>Jeu de données</th><th>Classification</th><th>Propriétaire</th><th>Modifiable ici</th><th></th></tr></thead><tbody>
+<tr><td>Référentiel du réseau</td><td><span class="et v">public</span></td><td>Observatoire</td><td><span class="sw on"></span></td><td><button class="act s">Modifier</button></td></tr>
+<tr><td>Comptages de circulation</td><td><span class="et v">public</span></td><td>Observatoire</td><td><span class="sw on"></span></td><td><button class="act s">Modifier</button></td></tr>
+<tr><td>Accidents de la circulation</td><td><span class="et o">restreint</span></td><td>ONASER</td><td><span class="sw"></span></td><td><button class="act s">Demander</button></td></tr>
+<tr><td>Validations billettique</td><td><span class="et r">sensible</span></td><td>SOTRACO</td><td><span class="sw"></span></td><td><button class="act s">Demander</button></td></tr>
+<tr><td>Infractions de stationnement</td><td><span class="et o">restreint</span></td><td>Police municipale</td><td><span class="sw"></span></td><td><button class="act s">Demander</button></td></tr>
 </tbody></table>
-<p style="font-size:14px;color:#5C6660;margin-top:16px">Une demande de reclassement est transmise au propriétaire et consignée. L'Observatoire ne peut pas publier une donnée contre la décision de celui qui la produit.</p></div>`,
+<p style="font-size:14px;color:var(--gris);margin-top:16px">Une demande de reclassement est transmise au propriétaire et consignée. L'Observatoire ne peut pas publier une donnée contre la décision de celui qui la produit.</p>`,
 `<div class="atitre">Journal d'accès</div>
-<p class="asous">Journal en écriture seule, recopié vers un collecteur administré par une autre personne. L'administrateur peut le lire, non le modifier.</p>
-<div class="bloc"><h4>Consultations des dernières heures</h4><div class="n">Sur données non publiques</div>
-<table class="tb"><thead><tr><th>Heure</th><th>Compte</th><th>Objet consulté</th><th>Motif déclaré</th></tr></thead><tbody>
-<tr><td>10:42</td><td>a.sawadogo</td><td>Accidents géolocalisés, Ouagadougou</td><td>Note d'analyse points noirs</td></tr>
-<tr><td>09:58</td><td>j.korsaga</td><td>Synthèse nationale</td><td>—</td></tr>
-<tr><td>09:14</td><td>a.sawadogo</td><td>Extraction vitesse commerciale, 12 mois</td><td>Rapport annuel</td></tr>
-<tr><td>08:30</td><td>service-technique-bobo</td><td>Indicateurs Bobo-Dioulasso</td><td>—</td></tr>
-</tbody></table></div>`];
+<p class="asous">Journal en écriture seule, recopié vers un collecteur administré par une autre personne. L'administrateur le lit, il ne le modifie pas.</p>
+<div class="stream">
+ <div><span class="t">10:42</span><b>a.sawadogo</b> — consultation · accidents géolocalisés, Ouagadougou · motif : note d'analyse points noirs</div>
+ <div><span class="t">09:58</span><b>j.korsaga</b> — consultation · synthèse nationale</div>
+ <div><span class="t">09:14</span><b>a.sawadogo</b> — extraction · vitesse commerciale 12 mois · 3 240 lignes · motif : rapport annuel</div>
+ <div><span class="t">08:30</span><b>service-technique-bobo</b> — consultation · indicateurs Bobo-Dioulasso</div>
+ <div><span class="t">08:02</span><b>sotraco-exploitation</b> — dépôt · validations billettique août · 412 880 lignes</div>
+ <div><span class="t">07:44</span><b>b.nikiema</b> — administration · renouvellement d'habilitation · compte etudiant-2026-011</div>
+</div>
+<p style="font-size:14px;color:var(--gris);margin-top:16px">Conservation cinq ans. Toute consultation de donnée non publique porte un motif déclaré ; les consultations de données publiques n'en portent pas.</p>`];
 
 let profilActuel=null;
 function connecter(){document.getElementById('modal').classList.add('on')}
@@ -986,6 +1122,20 @@ function ouvrir(p){
   document.getElementById('acorps').innerHTML=
     V[p].map((h,i)=>`<div class="vue${i===0?' on':''}">${h}</div>`).join('');
   document.getElementById('app').classList.add('on');
+  if(p==='collectivite' && typeof L!=='undefined'){
+    setTimeout(()=>{
+      const c=document.getElementById('cartec'); if(!c||c._leaflet_id) return;
+      const mc=L.map('cartec',{scrollWheelZoom:false}).setView([11.178,-4.297],13);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        {attribution:'&copy; OpenStreetMap, &copy; CARTO',maxZoom:18}).addTo(mc);
+      L.polyline([[11.190,-4.320],[11.182,-4.305],[11.174,-4.290],[11.166,-4.276]],
+        {color:'#1F5641',weight:5}).addTo(mc).bindPopup('Ligne 3 — itinéraire mis à jour le 26 août');
+      L.circleMarker([11.178,-4.297],{radius:9,color:'#D99A0B',weight:3,fillColor:'#D99A0B',fillOpacity:.35})
+        .addTo(mc).bindPopup('Point de comptage — rond-point du Paysan');
+      L.circleMarker([11.170,-4.312],{radius:9,color:'#A8421F',weight:3,fillColor:'#A8421F',fillOpacity:.3})
+        .addTo(mc).bindPopup('Secteur non couvert : aucun arrêt référencé');
+    },120);
+  }
   document.body.style.overflow='hidden';
   window.scrollTo(0,0);
   const sel=document.getElementById('profil');
