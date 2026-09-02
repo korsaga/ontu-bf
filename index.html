@@ -1,796 +1,1012 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ONTU-BF — Observatoire National des Transports Urbains du Burkina Faso</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Observatoire national des transports urbains du Burkina Faso</title>
+<meta name="description" content="Les données de mobilité des dix-sept chefs-lieux de région, publiées avec leur méthode et leur date.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{
-  --paper:#EDF0EE; --surface:#FFFFFF; --ink:#101A17; --ink-2:#33433E;
-  --mute:#66776F; --faint:#93A29B; --line:#DFE5E1; --line-2:#C9D3CD;
-  --vert:#0B6B58; --vert-d:#075143; --vert-l:#E4F0EC;
-  --or:#B07C0C; --or-l:#FBF2DE;
-  --rouge:#B03A2E; --rouge-l:#FAE9E6;
-  --bleu:#2C6E9B; --bleu-l:#E6F0F7;
-  --disp:'Archivo',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
-  --sh:0 1px 2px rgba(16,26,23,.05), 0 6px 18px -10px rgba(16,26,23,.22);
+  --nuit:#131E1A; --foret:#1F5641; --foret2:#2E7A5C;
+  --laterite:#A8421F; --or:#D99A0B;
+  --sable:#F3EFE8; --sable2:#E8E1D6; --craie:#FFFFFF;
+  --gris:#5C6660; --gris2:#8C948F;
+  --disp:'Bricolage Grotesque',system-ui,sans-serif;
+  --corps:'Instrument Sans',system-ui,sans-serif;
+  --max:1200px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased}
-button,input,select{font-family:inherit;cursor:pointer}
-::selection{background:rgba(11,107,88,.18)}
-.app{display:flex;min-height:100vh}
+html{scroll-behavior:smooth}
+body{background:var(--sable);color:var(--nuit);font-family:var(--corps);font-size:16.5px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+a{color:inherit;text-decoration:none}
+button,select{font:inherit;cursor:pointer}
+h1,h2,h3{font-family:var(--disp);font-weight:700;line-height:1.05;letter-spacing:-.02em}
+:focus-visible{outline:3px solid var(--or);outline-offset:3px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
 
-/* ---------- Rail ---------- */
-.rail{width:236px;flex:none;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
-.mark{display:flex;gap:11px;align-items:center;padding:18px 18px 14px;border-bottom:1px solid var(--line)}
-.mark .sq{width:38px;height:38px;flex:none;border-radius:3px;background:var(--vert);display:grid;place-items:center;position:relative}
-.mark .sq::after{content:"";position:absolute;right:-3px;bottom:-3px;width:14px;height:14px;background:var(--or);border-radius:2px}
-.mark .sq svg{width:21px;height:21px;position:relative;z-index:1}
-.mark h1{font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:-.4px;line-height:1}
-.mark p{font-size:10px;color:var(--faint);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;font-weight:500}
-.rail nav{padding:12px 10px;flex:1;overflow-y:auto}
-.rail .grp{font-size:9.5px;text-transform:uppercase;letter-spacing:1.1px;color:var(--faint);font-weight:600;padding:12px 10px 6px}
-.nv{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 11px;border:none;background:none;border-radius:4px;color:var(--ink-2);font-size:13.5px;font-weight:500;transition:.14s}
-.nv svg{width:17px;height:17px;flex:none;opacity:.6}
-.nv:hover{background:var(--paper)}
-.nv.on{background:var(--vert);color:#fff}
-.nv.on svg{opacity:1}
-.nv .cnt{margin-left:auto;font-family:var(--mono);font-size:10.5px;opacity:.7}
-.rail .foot{padding:14px 18px;border-top:1px solid var(--line);font-size:11px;color:var(--faint)}
-.rail .foot .l{display:flex;align-items:center;gap:7px;color:var(--vert);font-weight:600;margin-bottom:5px}
-.rail .foot .l i{width:7px;height:7px;border-radius:50%;background:var(--vert);font-style:normal}
+.top{position:sticky;top:0;z-index:60;background:rgba(243,239,232,.94);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--sable2)}
+.topin{max-width:var(--max);margin:0 auto;padding:15px 28px;display:flex;align-items:center;gap:32px}
+.logo{display:flex;align-items:center;gap:13px;flex:none}
+.logo svg{width:40px;height:40px;flex:none}
+.logo b{font-family:var(--disp);font-size:20px;letter-spacing:-.03em;display:block;line-height:1}
+.logo i{font-size:11.5px;color:var(--gris);display:block;margin-top:3px;max-width:190px;line-height:1.25;font-style:normal}
+nav{margin-left:auto;display:flex;gap:26px;align-items:center}
+nav a{font-size:15px;color:var(--gris);padding:6px 0;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+nav a:hover,nav a.on{color:var(--nuit);border-color:var(--or)}
+.cnx{background:var(--foret);color:#fff;padding:9px 17px;border:none;font-size:14.5px;font-weight:500}
+.cnx:hover{background:var(--nuit)}
+.burger{display:none;background:none;border:none;padding:6px}
+.burger span{display:block;width:22px;height:2px;background:var(--nuit);margin:4px 0}
 
-/* ---------- Head ---------- */
-.wrap{flex:1;min-width:0;display:flex;flex-direction:column}
-.head{padding:20px 26px 14px;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
-.head h2{font-family:var(--disp);font-size:23px;font-weight:700;letter-spacing:-.6px}
-.head p{font-size:12.5px;color:var(--mute);margin-top:3px;max-width:62ch}
-.head .sp{flex:1}
-.tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:6px 11px;border-radius:3px;border:1px solid var(--line-2);background:var(--surface);color:var(--mute);white-space:nowrap}
-.tag.warn{color:var(--or);background:var(--or-l);border-color:#EBD9A8}
-main{padding:0 26px 34px;display:flex;flex-direction:column;gap:16px}
-.view{display:none;flex-direction:column;gap:16px}
-.view.on{display:flex}
+.hero{position:relative;background:var(--nuit);overflow:hidden}
+.slides{position:relative;height:clamp(430px,64vh,620px)}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease}
+.slide.on{opacity:1}
+.slide svg,.slide img{width:100%;height:100%;object-fit:cover;display:block}
+.veil{position:absolute;inset:0;background:linear-gradient(100deg,rgba(19,30,26,.92) 0%,rgba(19,30,26,.62) 46%,rgba(19,30,26,.06) 82%)}
+.hcopy{position:absolute;inset:0;display:flex;align-items:flex-end;padding-bottom:78px}
+.hcopy .wrap{width:100%}
+.hcopy h1{color:#fff;font-size:clamp(34px,5.2vw,62px);max-width:15ch;font-weight:800}
+.hcopy p{color:#D7DEDA;font-size:17.5px;max-width:46ch;margin-top:18px}
+.hcredit{position:absolute;right:28px;bottom:28px;color:#9FAAA5;font-size:12.5px;text-align:right;max-width:210px;line-height:1.35}
+.dots{position:absolute;left:0;right:0;bottom:28px}
+.dots .wrap{display:flex;gap:10px;align-items:center}
+.dot{width:38px;height:3px;background:rgba(255,255,255,.28);border:none;padding:0;transition:background .3s}
+.dot.on{background:var(--or)}
 
-/* ---------- Cards ---------- */
-.card{background:var(--surface);border:1px solid var(--line);border-radius:5px;overflow:hidden}
-.ch{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.ch h3{font-family:var(--disp);font-size:14px;font-weight:600;letter-spacing:-.2px}
-.ch .s{margin-left:auto;font-size:11px;color:var(--faint);font-weight:500}
-.cb{padding:16px}
+.bande{background:var(--craie);border-bottom:1px solid var(--sable2)}
+.anneaux{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:44px 0 40px}
+.anneau{text-align:center;padding:0 14px;position:relative}
+.anneau+.anneau::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:1px;background:var(--sable2)}
+.anneau svg{width:104px;height:104px}
+.anneau .val{font-family:var(--disp);font-size:26px;font-weight:700;line-height:1;margin-top:-63px;position:relative}
+.anneau .nom{font-size:15px;margin-top:44px;line-height:1.3;font-weight:500}
+.anneau .u{font-size:13px;color:var(--gris);margin-top:4px}
+.anneau .maj{font-size:12.5px;color:var(--gris2);margin-top:3px}
 
-/* ---------- Bandeau fraîcheur (élément signature) ---------- */
-.fresh{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:14px 16px}
-.fresh .ft{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.fresh .ft h3{font-family:var(--disp);font-size:13.5px;font-weight:600}
-.fresh .ft .note{font-size:11.5px;color:var(--mute)}
-.fresh .ft .lg{margin-left:auto;display:flex;gap:12px;font-size:10.5px;color:var(--mute)}
-.fresh .ft .lg span{display:flex;align-items:center;gap:5px}
-.fresh .ft .lg i{width:9px;height:9px;border-radius:2px;font-style:normal}
-.ftrack{display:flex;gap:3px}
-.fcell{flex:1;min-width:0;border-radius:2px;padding:8px 7px;border:1px solid transparent;cursor:pointer;transition:.14s}
-.fcell:hover{transform:translateY(-2px)}
-.fcell .fk{font-size:10.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fcell .fd{font-family:var(--mono);font-size:9.5px;opacity:.75;margin-top:3px}
-.f-ok{background:var(--vert-l);color:var(--vert-d);border-color:#C6E2D8}
-.f-mid{background:var(--or-l);color:#7A5606;border-color:#EBD9A8}
-.f-old{background:var(--rouge-l);color:#7E2A21;border-color:#F0CFC9}
+section{padding:78px 0}
+.stitre{font-size:clamp(27px,3.4vw,40px);max-width:20ch}
+.sintro{color:var(--gris);font-size:17px;max-width:62ch;margin-top:14px}
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-bottom:44px;flex-wrap:wrap}
+.lien{color:var(--foret);font-weight:600;font-size:15.5px;border-bottom:2px solid var(--or);padding-bottom:2px}
+.lien:hover{color:var(--laterite)}
 
-/* ---------- KPI ---------- */
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:14px 15px;position:relative}
-.kpi .k{font-size:11px;color:var(--mute);font-weight:500;display:flex;align-items:center;gap:7px}
-.kpi .k b{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 5px;border-radius:2px;letter-spacing:.3px}
-.kpi .v{font-family:var(--disp);font-size:27px;font-weight:700;letter-spacing:-1px;margin-top:9px;line-height:1;font-variant-numeric:tabular-nums}
-.kpi .v span{font-size:13px;color:var(--faint);font-weight:600;letter-spacing:0}
-.kpi .m{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:7px}
-.spark{margin-top:9px;height:26px;width:100%}
+.data{background:var(--craie)}
+.gr{display:grid;grid-template-columns:1.55fr 1fr;gap:34px;align-items:start}
+.panneau{border:1px solid var(--sable2);padding:26px}
+.ptitre{font-family:var(--disp);font-size:19px;font-weight:700}
+.pnote{font-size:13.5px;color:var(--gris2);margin-top:5px;margin-bottom:20px}
+.courbe{width:100%;height:auto;display:block}
+.leg{display:flex;gap:20px;font-size:13.5px;color:var(--gris);margin-top:14px;flex-wrap:wrap}
+.leg i{display:inline-block;width:16px;height:3px;vertical-align:middle;margin-right:7px}
+.modes{display:flex;flex-direction:column;gap:17px}
+.mode{display:flex;align-items:center;gap:15px}
+.mode svg{width:58px;height:58px;flex:none}
+.mode .mv{font-family:var(--disp);font-size:21px;font-weight:700;line-height:1}
+.mode .mn{font-size:14.5px;line-height:1.3;margin-top:2px}
+.ville{display:grid;grid-template-columns:118px 1fr 52px;gap:14px;align-items:center;padding:8px 0;
+  border-bottom:1px solid var(--sable2);font-size:14.5px}
+.ville:last-child{border:none}
+.barre{height:9px;background:var(--sable2);position:relative}
+.barre i{position:absolute;left:0;top:0;bottom:0;background:var(--laterite)}
+.ville b{text-align:right;font-family:var(--disp);font-weight:700;font-size:15.5px}
 
-/* ---------- Carte ---------- */
-.mapgrid{display:grid;grid-template-columns:1.65fr 1fr;gap:16px}
-#map{height:475px;background:var(--line)}
-.mapbox{position:relative}
-.mtool{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center;background:var(--surface)}
-.chip{font-size:11.5px;font-weight:600;padding:6px 10px;border:1px solid var(--line-2);background:var(--surface);color:var(--mute);border-radius:3px;transition:.14s}
-.chip:hover{border-color:var(--vert);color:var(--vert)}
-.chip.on{background:var(--vert);border-color:var(--vert);color:#fff}
-.mtool .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
-.mtool label{font-size:11.5px;color:var(--mute);display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
-.leg{position:absolute;left:12px;bottom:12px;z-index:600;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:4px;padding:10px 12px;backdrop-filter:blur(6px)}
-.leg .lt{font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--faint);font-weight:600;margin-bottom:7px}
-.leg .lr{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--mute);margin-top:4px;font-weight:500}
-.leg .sw{width:11px;height:11px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
-.mk-w{background:none!important;border:none!important}
-.mk{width:100%;height:100%;border-radius:50%;background:var(--c);border:2px solid #fff;box-shadow:0 2px 6px rgba(16,26,23,.4);transition:transform .15s}
-.mk:hover{transform:scale(1.2)}
-.mk.p1{border-color:var(--ink);border-width:2.5px}
-.mk.sel::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--c);animation:pl 1.8s ease-out infinite}
-@keyframes pl{0%{transform:scale(.65);opacity:.85}100%{transform:scale(1.5);opacity:0}}
-.tip{background:var(--ink);border:none;color:#fff;font-size:11.5px;font-weight:600;border-radius:3px;padding:5px 9px;box-shadow:0 6px 14px rgba(16,26,23,.3)}
-.tip::before{border-top-color:var(--ink)!important}
-.leaflet-container{font-family:var(--body)}
-.nomap{display:none;height:475px;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:repeating-linear-gradient(45deg,#E7EBE9,#E7EBE9 12px,#EDF0EE 12px,#EDF0EE 24px);color:var(--mute);font-size:13px;text-align:center;padding:24px}
+#carte{height:430px;border:1px solid var(--sable2)}
+.leaflet-container{background:var(--sable2)}
 
-/* ---------- Fiche indicateur ---------- */
-.fiche .nm{font-family:var(--disp);font-size:21px;font-weight:700;letter-spacing:-.6px}
-.fiche .rg{font-size:12px;color:var(--mute);margin-top:2px}
-.bdg{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:3px;margin-top:11px;margin-right:5px}
-.meta{margin-top:14px;border:1px solid var(--line);border-radius:4px;overflow:hidden}
-.meta .mr{display:flex;gap:10px;padding:8px 11px;font-size:11.5px;border-bottom:1px solid var(--line)}
-.meta .mr:last-child{border-bottom:none}
-.meta .mk2{color:var(--faint);width:104px;flex:none;font-weight:500}
-.meta .mv{color:var(--ink-2);font-weight:500}
-.meta .mv.mono{font-family:var(--mono);font-size:11px}
-.gg{margin-top:13px}
-.gg .gl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mute);font-weight:500;margin-bottom:5px}
-.gg .gl b{color:var(--ink);font-family:var(--mono)}
-.tr{height:7px;background:var(--line);border-radius:4px;overflow:hidden}
-.fl{height:100%;border-radius:4px;transition:width .5s}
-.warnbox{margin-top:14px;background:var(--or-l);border:1px solid #EBD9A8;border-radius:4px;padding:10px 12px;font-size:11.5px;color:#7A5606;display:flex;gap:8px;line-height:1.45}
-.warnbox svg{width:14px;height:14px;flex:none;margin-top:1px}
-.dlrow{display:flex;gap:7px;margin-top:13px;flex-wrap:wrap}
-.dl{font-size:11.5px;font-weight:600;padding:7px 11px;border:1px solid var(--line-2);border-radius:3px;background:var(--surface);color:var(--ink-2);display:inline-flex;align-items:center;gap:6px;transition:.14s}
-.dl:hover{border-color:var(--vert);color:var(--vert);background:var(--vert-l)}
-.dl svg{width:13px;height:13px}
+.pubs{display:grid;grid-template-columns:1.35fr 1fr;gap:40px}
+.une .vign{aspect-ratio:16/9;overflow:hidden;background:var(--nuit)}
+.une .vign svg{width:100%;height:100%;display:block}
+.une h3{font-size:26px;margin-top:20px;max-width:24ch}
+.une p{color:var(--gris);margin-top:10px;max-width:52ch}
+.meta{font-size:13.5px;color:var(--gris2);margin-top:12px}
+.liste li{list-style:none;padding:19px 0;border-top:1px solid var(--sable2)}
+.liste li:first-child{border-top:none;padding-top:0}
+.liste h3{font-size:18.5px;line-height:1.25}
+.liste a:hover h3{color:var(--laterite)}
 
-/* ---------- Série ---------- */
-.serie{width:100%;height:150px}
-.slider{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
-.slider input[type=range]{flex:1;min-width:160px;accent-color:var(--vert)}
-.slider .yr{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--vert);min-width:46px}
-.slider .lb{font-size:11.5px;color:var(--mute);font-weight:500}
-.play{font-size:11.5px;font-weight:600;padding:6px 12px;border:1px solid var(--line-2);border-radius:3px;background:var(--surface);color:var(--ink-2)}
-.play:hover{border-color:var(--vert);color:var(--vert)}
+.jeux{background:var(--nuit);color:#E6EAE8}
+.jeux .stitre{color:#fff}
+.jeux .sintro{color:#A9B4AF}
+.jx{width:100%;border-collapse:collapse;font-size:15px}
+.jx th{text-align:left;font-family:var(--disp);font-weight:500;font-size:13.5px;color:#8C948F;
+  padding:0 0 13px;border-bottom:1px solid #2A3833}
+.jx td{padding:16px 0;border-bottom:1px solid #202D28;vertical-align:top}
+.jx td:first-child{font-weight:600}
+.jx small{display:block;color:#8C948F;font-size:13.5px;margin-top:3px;max-width:44ch}
+.dl{color:var(--or);font-weight:600;white-space:nowrap}
+.dl:hover{color:#fff}
+.fmt{color:#8C948F;font-size:13.5px}
 
-/* ---------- Table ---------- */
-table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);font-weight:600;text-align:right;padding:9px 12px;cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--line);user-select:none}
-thead th:first-child{text-align:left}
-thead th.act{color:var(--vert)}
-tbody td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
-tbody td:first-child{text-align:left}
-tbody tr{cursor:pointer}
-tbody tr:hover{background:var(--paper)}
-tbody tr.sel{background:var(--vert-l)}
-.cn{display:flex;align-items:center;gap:9px;font-weight:600}
-.cn .d{width:9px;height:9px;border-radius:50%;flex:none}
-.cn .p{font-family:var(--mono);font-size:9px;padding:1px 4px;border-radius:2px;background:var(--ink);color:#fff;font-weight:700}
-.pill{display:inline-block;min-width:44px;font-family:var(--mono);font-size:11px;font-weight:500;padding:2px 7px;border-radius:2px;text-align:center}
+footer{background:var(--craie);border-top:1px solid var(--sable2);padding:52px 0 34px;font-size:14.5px}
+.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:34px}
+footer h4{font-family:var(--disp);font-size:15px;font-weight:700;margin-bottom:13px}
+footer li{list-style:none;margin-bottom:8px;color:var(--gris)}
+footer a:hover{color:var(--laterite)}
+.fbas{margin-top:40px;padding-top:20px;border-top:1px solid var(--sable2);color:var(--gris2);
+  font-size:13.5px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 
-/* ---------- Catalogue ---------- */
-.cat{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.ds{border:1px solid var(--line);border-radius:4px;padding:14px 15px;background:var(--surface);display:flex;flex-direction:column;gap:9px}
-.ds h4{font-family:var(--disp);font-size:14px;font-weight:600}
-.ds .dd{font-size:12px;color:var(--mute);line-height:1.45}
-.ds .dt{display:flex;gap:6px;flex-wrap:wrap}
-.tg{font-family:var(--mono);font-size:9.5px;font-weight:500;padding:2px 6px;border-radius:2px;background:var(--paper);color:var(--mute);border:1px solid var(--line)}
-.tg.pub{background:var(--vert-l);color:var(--vert-d);border-color:#C6E2D8}
-.tg.res{background:var(--or-l);color:#7A5606;border-color:#EBD9A8}
-.tg.com{background:var(--bleu-l);color:#1F5476;border-color:#C7DCEA}
-.api{font-family:var(--mono);font-size:10.5px;background:var(--ink);color:#C9E7DD;padding:8px 10px;border-radius:3px;overflow-x:auto;white-space:nowrap}
+.demo{position:fixed;right:16px;bottom:16px;z-index:900;background:var(--nuit);color:#fff;
+  padding:13px 15px;max-width:292px;box-shadow:0 10px 30px rgba(0,0,0,.3);font-size:13px;line-height:1.45}
+.demo b{font-family:var(--disp);display:block;margin-bottom:4px;font-size:14px}
+.demo select{width:100%;margin-top:9px;padding:7px 8px;border:none;font-size:13px}
+.demo .x{position:absolute;top:7px;right:9px;background:none;border:none;color:#7C857F;font-size:17px;line-height:1}
+.nav2{position:fixed;left:16px;bottom:16px;z-index:900;background:#131E19;color:#fff;padding:8px 11px;font-size:13px}
+.nav2 span{color:#8C948F;margin-right:9px}
+.nav2 a{padding:4px 9px}
 
-/* ---------- Comparateur ---------- */
-.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.cmp select{width:100%;padding:8px 10px;border:1px solid var(--line-2);border-radius:3px;font-size:13px;background:var(--surface);color:var(--ink)}
-.cmpbars{display:flex;flex-direction:column;gap:12px;margin-top:16px}
-.cb2{display:grid;grid-template-columns:118px 1fr 1fr;gap:9px;align-items:center}
-.cb2 .l{font-size:12px;color:var(--mute);font-weight:500}
-.cb2 .side{display:flex;align-items:center;gap:7px}
-.cb2 .bar{height:9px;border-radius:4px;flex:1}
-.cb2 .n{font-family:var(--mono);font-size:11.5px;min-width:56px}
-.cb2 .side.a{flex-direction:row-reverse}
-.cb2 .side.a .n{text-align:left}
+/* ═══ connexion et espace authentifié ═══ */
+.modal{position:fixed;inset:0;z-index:1000;background:rgba(19,30,26,.72);display:none;
+  align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(3px)}
+.modal.on{display:flex}
+.mbox{background:var(--craie);max-width:520px;width:100%;padding:34px}
+.mbox h3{font-size:24px}
+.mbox p{color:var(--gris);margin-top:8px;font-size:15px}
+.champ{margin-top:18px}
+.champ label{display:block;font-size:13.5px;color:var(--gris);margin-bottom:5px}
+.champ input{width:100%;padding:11px 13px;border:1px solid var(--sable2);background:var(--sable);font-size:15px}
+.prof{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:8px}
+.prof button{text-align:left;padding:11px 13px;border:1px solid var(--sable2);background:var(--sable);font-size:14px;line-height:1.3}
+.prof button:hover{border-color:var(--foret);background:#fff}
+.prof button b{display:block;font-family:var(--disp);font-size:14.5px;font-weight:700}
+.prof button span{color:var(--gris2);font-size:12.5px}
+.mbox .fin{margin-top:20px;font-size:13px;color:var(--gris2);border-top:1px solid var(--sable2);padding-top:14px}
+.mclose{float:right;background:none;border:none;font-size:22px;color:var(--gris2);line-height:1;margin:-8px -6px 0 0}
 
-footer.pg{padding:16px 26px 30px;font-size:11px;color:var(--faint);border-top:1px solid var(--line);display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:6px}
-footer.pg b{color:var(--mute);font-weight:600}
+#app{position:fixed;inset:0;z-index:990;background:var(--sable);display:none;overflow:auto}
+#app.on{display:block}
+.abar{background:var(--nuit);color:#fff;position:sticky;top:0;z-index:5}
+.abarin{max-width:1320px;margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:22px}
+.abar .who{margin-left:auto;text-align:right;line-height:1.25}
+.abar .who b{font-family:var(--disp);font-size:14.5px;display:block}
+.abar .who span{font-size:12.5px;color:#8C948F}
+.dec{background:none;border:1px solid #3A4A44;color:#fff;padding:8px 14px;font-size:14px}
+.dec:hover{background:#2A3833}
+.atabs{background:#0E1815;border-bottom:1px solid #26332E}
+.atabsin{max-width:1320px;margin:0 auto;padding:0 26px;display:flex;gap:24px;overflow-x:auto}
+.atabsin button{background:none;border:none;color:#8C948F;padding:13px 0;font-size:14.5px;white-space:nowrap;
+  border-bottom:2px solid transparent}
+.atabsin button.on{color:#fff;border-color:var(--or)}
+.acorps{max-width:1320px;margin:0 auto;padding:34px 26px 70px}
+.atitre{font-family:var(--disp);font-size:27px;font-weight:700;letter-spacing:-.02em}
+.asous{color:var(--gris);margin-top:7px;max-width:66ch}
+.grille4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:26px}
+.grille3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
+.grille2{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;margin-top:26px;align-items:start}
+.kpi{background:var(--craie);border:1px solid var(--sable2);padding:18px 20px}
+.kpi .k{font-size:13.5px;color:var(--gris)}
+.kpi .v{font-family:var(--disp);font-size:30px;font-weight:700;line-height:1.1;margin-top:7px}
+.kpi .d{font-size:13px;color:var(--gris2);margin-top:6px}
+.kpi.alerte{border-left:4px solid var(--laterite)}
+.kpi.ok{border-left:4px solid var(--foret)}
+.kpi.attente{border-left:4px solid var(--or)}
+.bloc{background:var(--craie);border:1px solid var(--sable2);padding:22px 24px;margin-top:22px}
+.bloc h4{font-family:var(--disp);font-size:18px;font-weight:700}
+.bloc .n{font-size:13.5px;color:var(--gris2);margin-top:4px;margin-bottom:16px}
+.tb{width:100%;border-collapse:collapse;font-size:14.5px}
+.tb th{text-align:left;font-weight:500;font-size:13px;color:var(--gris2);padding:0 10px 10px 0;border-bottom:1px solid var(--sable2)}
+.tb td{padding:12px 10px 12px 0;border-bottom:1px solid var(--sable2);vertical-align:top}
+.tb tr:last-child td{border-bottom:none}
+.et{display:inline-block;padding:2px 8px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.et.v{background:#E4EFE6;color:#1F5641}
+.et.o{background:#FAF0D8;color:#8C6208}
+.et.r{background:#F7E3DC;color:#8C3618}
+.et.g{background:var(--sable2);color:var(--gris)}
+.mini{width:100%;height:auto;display:block}
+.act{background:var(--foret);color:#fff;border:none;padding:9px 16px;font-size:14.5px;font-weight:500}
+.act:hover{background:var(--nuit)}
+.act.s{background:none;color:var(--foret);border:1px solid var(--sable2)}
+.act.s:hover{background:var(--craie)}
+.vue{display:none}
+.vue.on{display:block}
+@media(max-width:940px){.grille4,.grille3,.grille2{grid-template-columns:1fr}.prof{grid-template-columns:1fr}}
 
-@media(max-width:1100px){
-  .kpis{grid-template-columns:repeat(2,1fr)}
-  .mapgrid{grid-template-columns:1fr}
-  .cat{grid-template-columns:1fr}
-  .ftrack{flex-wrap:wrap}
-  .fcell{min-width:110px}
+@media(max-width:940px){
+  nav{display:none}
+  .burger{display:block;margin-left:auto}
+  .anneaux{grid-template-columns:repeat(2,1fr);gap:26px}
+  .anneau:nth-child(3)::before{display:none}
+  .gr,.pubs,.fgrid{grid-template-columns:1fr}
+  .hcredit{display:none}
+  .jx thead{display:none}
+  .jx td{display:block;border:none;padding:4px 0}
+  .jx tr{display:block;padding:16px 0;border-bottom:1px solid #202D28}
 }
-@media(max-width:820px){
-  .app{flex-direction:column}
-  .rail{width:100%;height:auto;position:static;border-right:none;border-bottom:1px solid var(--line)}
-  .rail nav{display:flex;gap:4px;overflow-x:auto;padding:8px}
-  .rail .grp,.rail .foot{display:none}
-  .nv{white-space:nowrap;width:auto}
-  .nv .cnt{display:none}
-  .head,main,footer.pg{padding-left:16px;padding-right:16px}
-  .cmp{grid-template-columns:1fr}
-  #map,.nomap{height:360px}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
 }
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div class="app">
 
-<aside class="rail">
-  <div class="mark">
-    <div class="sq"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18h16M7 18V9m5 9V5m5 13v-6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></div>
-    <div><h1>ONTU-BF</h1><p>Observatoire des transports urbains</p></div>
+<header class="top">
+  <div class="topin">
+    <a href="#" class="logo">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="19" fill="#1F5641"/>
+        <circle cx="20" cy="20" r="11.5" fill="none" stroke="#F3EFE8" stroke-width="2.4"/>
+        <circle cx="20" cy="20" r="4" fill="#D99A0B"/>
+        <path d="M20 1v6M20 33v6M1 20h6M33 20h6" stroke="#F3EFE8" stroke-width="2.4"/>
+      </svg>
+      <span><b>ONTU-BF</b><i>Observatoire national des transports urbains</i></span>
+    </a>
+    <nav>
+      <a href="#indicateurs">Indicateurs</a>
+      <a href="#carte-s">Carte</a>
+      <a href="#publications">Publications</a>
+      <a href="#donnees">Données ouvertes</a>
+      <a href="#methode">Méthode</a>
+    </nav>
+    <button class="cnx">Se connecter</button>
+    <button class="burger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
-  <nav id="nav">
-    <div class="grp">Consulter</div>
-    <button class="nv on" data-view="synthese"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="8" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Synthèse nationale</button>
-    <button class="nv" data-view="reseau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8 6h6a4 4 0 010 8h-4a4 4 0 000 8"/></svg>Réseau de transport</button>
-    <button class="nv" data-view="compare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v16M7 9L4 12l3 3M17 9l3 3-3 3"/></svg>Comparer deux villes</button>
-    <div class="grp">Réutiliser</div>
-    <button class="nv" data-view="donnees"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>Données ouvertes<span class="cnt">9</span></button>
-    <button class="nv" data-view="qualite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Fraîcheur &amp; méthode</button>
-  </nav>
-  <div class="foot">
-    <div class="l"><i></i>Palier 1 en service</div>
-    Ouagadougou · Bobo-Dioulasso · Koudougou<br>14 villes en attente de raccordement
-  </div>
-</aside>
+</header>
 
-<div class="wrap">
-  <header class="head">
-    <div>
-      <h2 id="vtitle">Synthèse nationale</h2>
-      <p id="vsub">Indicateurs de mobilité des dix-sept chefs-lieux de région. Chaque valeur porte sa source, sa date de production et sa maille.</p>
+<section class="hero" aria-label="À la une">
+  <div class="slides">
+
+    <!-- Photo à déposer : img/hero-echangeur.jpg -->
+    <div class="slide on">
+      <svg viewBox="0 0 1600 700" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Échangeur routier à Ouagadougou">
+        <defs><linearGradient id="c1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2B4038"/><stop offset=".55" stop-color="#6B5432"/><stop offset="1" stop-color="#A8421F"/>
+        </linearGradient></defs>
+        <rect width="1600" height="700" fill="url(#c1)"/>
+        <circle cx="1210" cy="235" r="78" fill="#D99A0B" opacity=".9"/>
+        <path d="M0 700 L0 520 Q380 470 700 512 T1600 480 L1600 700Z" fill="#1B2A24"/>
+        <path d="M0 700 L0 596 Q420 556 820 590 T1600 566 L1600 700Z" fill="#121E19"/>
+        <path d="M-40 470 Q420 356 900 424 T1660 392" fill="none" stroke="#2A3A33" stroke-width="46"/>
+        <path d="M-40 470 Q420 356 900 424 T1660 392" fill="none" stroke="#3A4E45" stroke-width="4"/>
+        <path d="M-40 566 Q460 640 940 552 T1660 514" fill="none" stroke="#22322B" stroke-width="52"/>
+        <path d="M-40 566 Q460 640 940 552 T1660 514" fill="none" stroke="#32463D" stroke-width="4"/>
+        <g fill="#182620">
+          <rect x="250" y="404" width="19" height="200"/><rect x="620" y="392" width="19" height="230"/>
+          <rect x="1010" y="424" width="19" height="196"/><rect x="1370" y="404" width="19" height="180"/>
+        </g>
+        <g fill="#D99A0B"><rect x="330" y="402" width="42" height="13" rx="2"/><rect x="700" y="396" width="30" height="12" rx="2"/></g>
+        <g fill="#E8E1D6" opacity=".85"><rect x="500" y="402" width="26" height="11" rx="2"/><rect x="1120" y="416" width="36" height="12" rx="2"/></g>
+        <g fill="#A8421F"><rect x="420" y="606" width="34" height="12" rx="2"/><rect x="860" y="574" width="46" height="14" rx="2"/></g>
+        <g stroke="#0E1815" stroke-width="5" fill="none">
+          <path d="M180 452v-96M180 356h34"/><path d="M760 410v-96M760 314h34"/><path d="M1290 400v-96M1290 304h34"/>
+        </g>
+      </svg>
     </div>
-    <div class="sp"></div>
-    <span class="tag warn">Maquette · données simulées</span>
-    <span class="tag" id="tag-maj">—</span>
-  </header>
 
-  <main>
+    <!-- Photo à déposer : img/hero-rondpoint.jpg -->
+    <div class="slide">
+      <svg viewBox="0 0 1600 700" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Rond-point de Ouagadougou vu du ciel">
+        <rect width="1600" height="700" fill="#8A6034"/>
+        <rect width="1600" height="700" fill="#A8421F" opacity=".38"/>
+        <g stroke="#3A2A1D" stroke-width="74">
+          <path d="M800 350 L800 -60"/><path d="M800 350 L800 760"/>
+          <path d="M800 350 L60 350"/><path d="M800 350 L1540 350"/>
+          <path d="M800 350 L200 -20"/><path d="M800 350 L1420 740"/>
+        </g>
+        <g stroke="#C8B48E" stroke-width="2.6" stroke-dasharray="24 20" opacity=".5">
+          <path d="M800 350 L800 -60"/><path d="M800 350 L800 760"/>
+          <path d="M800 350 L60 350"/><path d="M800 350 L1540 350"/>
+        </g>
+        <circle cx="800" cy="350" r="188" fill="none" stroke="#3A2A1D" stroke-width="76"/>
+        <circle cx="800" cy="350" r="188" fill="none" stroke="#C8B48E" stroke-width="2.6" stroke-dasharray="24 20" opacity=".5"/>
+        <circle cx="800" cy="350" r="146" fill="#2E4A28"/>
+        <circle cx="800" cy="350" r="146" fill="none" stroke="#1F5641" stroke-width="8"/>
+        <path d="M800 240 L836 350 L800 400 L764 350Z" fill="#E8E1D6"/>
+        <circle cx="800" cy="228" r="15" fill="#D99A0B"/>
+        <g fill="#F3EFE8">
+          <circle cx="800" cy="162" r="7"/><circle cx="962" cy="252" r="7"/><circle cx="988" cy="420" r="7"/>
+          <circle cx="852" cy="530" r="7"/><circle cx="644" cy="486" r="7"/><circle cx="616" cy="292" r="7"/>
+          <circle cx="706" cy="176" r="7"/><circle cx="978" cy="336" r="7"/>
+        </g>
+        <g fill="#D99A0B">
+          <rect x="756" y="140" width="26" height="10" rx="2"/><rect x="912" y="470" width="26" height="10" rx="2"/>
+          <rect x="612" y="380" width="26" height="10" rx="2"/>
+        </g>
+      </svg>
+    </div>
 
-    <!-- ============ SYNTHÈSE ============ -->
-    <section class="view on" id="v-synthese">
+    <!-- Photo à déposer : img/hero-corridor.jpg -->
+    <div class="slide">
+      <svg viewBox="0 0 1600 700" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Corridor routier interurbain">
+        <defs><linearGradient id="c3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#16241F"/><stop offset=".62" stop-color="#3E5A48"/><stop offset="1" stop-color="#8A6034"/>
+        </linearGradient></defs>
+        <rect width="1600" height="700" fill="url(#c3)"/>
+        <circle cx="330" cy="180" r="54" fill="#D99A0B" opacity=".75"/>
+        <path d="M0 430 Q400 404 800 424 T1600 408 L1600 700 L0 700Z" fill="#6E4E2C"/>
+        <path d="M0 470 Q500 448 1000 466 T1600 452 L1600 700 L0 700Z" fill="#523A20"/>
+        <path d="M700 424 L900 424 L1310 700 L290 700Z" fill="#25332C"/>
+        <path d="M796 424 L804 424 L836 700 L764 700Z" fill="#C8B48E" opacity=".55"/>
+        <g stroke="#C8B48E" stroke-width="6" opacity=".35">
+          <path d="M726 424 L376 700"/><path d="M874 424 L1224 700"/>
+        </g>
+        <g fill="#1B2A20">
+          <circle cx="150" cy="452" r="34"/><rect x="145" y="452" width="10" height="46"/>
+          <circle cx="1470" cy="440" r="28"/><rect x="1466" y="440" width="9" height="40"/>
+          <circle cx="1290" cy="452" r="20"/><rect x="1287" y="452" width="7" height="30"/>
+        </g>
+        <rect x="905" y="516" width="118" height="54" rx="4" fill="#A8421F"/>
+        <rect x="1023" y="530" width="46" height="40" rx="4" fill="#8C3618"/>
+        <circle cx="948" cy="576" r="13" fill="#131E19"/><circle cx="1042" cy="576" r="13" fill="#131E19"/>
+        <rect x="600" y="486" width="90" height="38" rx="4" fill="#E8E1D6"/>
+        <circle cx="626" cy="528" r="10" fill="#131E19"/><circle cx="668" cy="528" r="10" fill="#131E19"/>
+      </svg>
+    </div>
+  </div>
 
-      <div class="fresh">
-        <div class="ft">
-          <h3>Fraîcheur des indicateurs</h3>
-          <span class="note">Aucun chiffre n'est publié sans sa date de production.</span>
-          <span class="lg">
-            <span><i style="background:#0B6B58"></i>à jour</span>
-            <span><i style="background:#B07C0C"></i>à rafraîchir</span>
-            <span><i style="background:#B03A2E"></i>périmé</span>
-          </span>
-        </div>
-        <div class="ftrack" id="ftrack"></div>
+  <div class="veil"></div>
+  <div class="hcopy"><div class="wrap">
+    <h1 id="htitre">Six millions neuf cent mille déplacements par jour</h1>
+    <p id="hsub">L'Observatoire rassemble, vérifie et publie les données de mobilité des dix-sept chefs-lieux de région. Chaque chiffre porte sa méthode et sa date.</p>
+  </div></div>
+  <p class="hcredit" id="hcredit">Échangeur de l'Est, Ouagadougou</p>
+  <div class="dots"><div class="wrap">
+    <button class="dot on" data-i="0" aria-label="Vue 1"></button>
+    <button class="dot" data-i="1" aria-label="Vue 2"></button>
+    <button class="dot" data-i="2" aria-label="Vue 3"></button>
+  </div></div>
+</section>
+
+<div class="bande"><div class="wrap"><div class="anneaux" id="anneaux">
+  <div class="anneau">
+    <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#E8E1D6" stroke-width="11"/>
+    <circle class="rg" cx="60" cy="60" r="50" fill="none" stroke="#1F5641" stroke-width="11"
+      stroke-dasharray="314" stroke-dashoffset="314" data-pct="68" transform="rotate(-90 60 60)"/></svg>
+    <div class="val">68&nbsp;%</div><div class="nom">Part des deux-roues et tricycles</div><div class="u">des déplacements</div><div class="maj">Enquête ménages, juin 2026</div>
+  </div>
+  <div class="anneau">
+    <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#E8E1D6" stroke-width="11"/>
+    <circle class="rg" cx="60" cy="60" r="50" fill="none" stroke="#A8421F" stroke-width="11"
+      stroke-dasharray="314" stroke-dashoffset="314" data-pct="41" transform="rotate(-90 60 60)"/></svg>
+    <div class="val">19,4</div><div class="nom">Vitesse commerciale moyenne</div><div class="u">km/h en heure de pointe</div><div class="maj">Août 2026, trois villes</div>
+  </div>
+  <div class="anneau">
+    <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#E8E1D6" stroke-width="11"/>
+    <circle class="rg" cx="60" cy="60" r="50" fill="none" stroke="#D99A0B" stroke-width="11"
+      stroke-dasharray="314" stroke-dashoffset="314" data-pct="25" transform="rotate(-90 60 60)"/></svg>
+    <div class="val">25&nbsp;%</div><div class="nom">Couverture du référentiel</div><div class="u">du réseau décrit</div><div class="maj">Mise à jour continue</div>
+  </div>
+  <div class="anneau">
+    <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#E8E1D6" stroke-width="11"/>
+    <circle class="rg" cx="60" cy="60" r="50" fill="none" stroke="#2E7A5C" stroke-width="11"
+      stroke-dasharray="314" stroke-dashoffset="314" data-pct="52" transform="rotate(-90 60 60)"/></svg>
+    <div class="val">2 218</div><div class="nom">Sécurité routière, cumul annuel</div><div class="u">accidents corporels</div><div class="maj">Avril 2026, sous-déclaration connue</div>
+  </div>
+</div></div></div>
+
+<section class="data" id="indicateurs"><div class="wrap">
+  <div class="shead">
+    <div>
+      <h2 class="stitre">Ce que les données montrent</h2>
+      <p class="sintro">Vingt-quatre indicateurs sont produits au premier palier. Chacun porte sa source, sa maille géographique et sa date de production.</p>
+    </div>
+    <a class="lien" href="#donnees">Voir tous les indicateurs</a>
+  </div>
+
+  <div class="gr">
+    <div class="panneau">
+      <div class="ptitre">Vitesse commerciale du transport collectif</div>
+      <div class="pnote">Kilomètres par heure en heure de pointe du matin, par ville, sur douze mois</div>
+      <svg class="courbe" viewBox="0 0 720 300" role="img" aria-label="Courbes de vitesse commerciale sur douze mois">
+        <rect x="480" y="40" width="72" height="222" fill="#A8421F" opacity=".07"/>
+        <g stroke="#E8E1D6" stroke-width="1">
+          <line x1="46" y1="40" x2="700" y2="40"/><line x1="46" y1="98" x2="700" y2="98"/>
+          <line x1="46" y1="156" x2="700" y2="156"/><line x1="46" y1="214" x2="700" y2="214"/>
+          <line x1="46" y1="262" x2="700" y2="262"/>
+        </g>
+        <g fill="#8C948F" font-size="12" font-family="Instrument Sans">
+          <text x="38" y="44" text-anchor="end">26</text><text x="38" y="102" text-anchor="end">23</text>
+          <text x="38" y="160" text-anchor="end">20</text><text x="38" y="218" text-anchor="end">17</text>
+          <text x="38" y="266" text-anchor="end">14</text>
+          <text x="60" y="286">sept.</text><text x="222" y="286">déc.</text>
+          <text x="386" y="286">mars</text><text x="548" y="286">juin</text><text x="672" y="286">août</text>
+          <text x="516" y="58" text-anchor="middle" font-size="11.5">saison des pluies</text>
+        </g>
+        <polyline fill="none" stroke="#D99A0B" stroke-width="3" stroke-dasharray="7 5" points="60,112 114,106 168,116 222,130 276,124 330,102 384,96 438,108 492,140 546,152 600,128 660,114"/>
+        <polyline fill="none" stroke="#1F5641" stroke-width="3" points="60,150 114,144 168,158 222,176 276,168 330,140 384,132 438,146 492,190 546,206 600,178 660,160"/>
+        <polyline fill="none" stroke="#A8421F" stroke-width="3" points="60,196 114,190 168,202 222,214 276,208 330,186 384,180 438,192 492,224 546,236 600,214 660,200"/>
+        <circle cx="660" cy="160" r="4.5" fill="#1F5641"/>
+        <circle cx="660" cy="200" r="4.5" fill="#A8421F"/>
+        <circle cx="660" cy="114" r="4.5" fill="#D99A0B"/>
+      </svg>
+      <div class="leg">
+        <span><i style="background:#1F5641"></i>Ouagadougou</span>
+        <span><i style="background:#A8421F"></i>Bobo-Dioulasso</span>
+        <span><i style="background:#D99A0B"></i>Koudougou</span>
       </div>
+    </div>
 
-      <div class="kpis" id="kpis"></div>
-
-      <div class="mapgrid">
-        <div class="card mapbox">
-          <div class="mtool" id="mtool"></div>
-          <div style="position:relative">
-            <div id="map"></div>
-            <div class="nomap" id="nomap">Fond de carte indisponible.<br>Les indicateurs et le classement restent consultables.</div>
-            <div class="leg" id="leg"></div>
+    <div>
+      <div class="panneau" style="margin-bottom:26px">
+        <div class="ptitre">Comment on se déplace</div>
+        <div class="pnote">Parts modales, ensemble des villes couvertes</div>
+        <div class="modes">
+          <div class="mode">
+            <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#E8E1D6" stroke-width="9"/>
+            <circle class="rg" cx="30" cy="30" r="24" fill="none" stroke="#1F5641" stroke-width="9"
+              stroke-dasharray="151" stroke-dashoffset="151" data-pct="68" transform="rotate(-90 30 30)"/></svg>
+            <div><div class="mv">68 %</div><div class="mn">Deux-roues et tricycles</div></div>
           </div>
-          <div class="slider">
-            <span class="lb">Année de référence</span>
-            <span class="yr" id="yr">2026</span>
-            <input type="range" id="range" min="2022" max="2026" step="1" value="2026" aria-label="Année de référence">
-            <button class="play" id="play">▶ Dérouler la série</button>
+          <div class="mode">
+            <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#E8E1D6" stroke-width="9"/>
+            <circle class="rg" cx="30" cy="30" r="24" fill="none" stroke="#A8421F" stroke-width="9"
+              stroke-dasharray="151" stroke-dashoffset="151" data-pct="14" transform="rotate(-90 30 30)"/></svg>
+            <div><div class="mv">14 %</div><div class="mn">Marche</div></div>
           </div>
-        </div>
-
-        <div class="card fiche">
-          <div class="ch"><h3>Fiche indicateur</h3><span class="s" id="fiche-cls">—</span></div>
-          <div class="cb" id="fiche"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="ch"><h3>Classement des villes</h3><span class="s">Cliquez un en-tête pour trier, une ligne pour sélectionner</span></div>
-        <div class="cb" style="padding:0 6px 6px">
-          <table>
-            <thead><tr>
-              <th data-s="name">Ville</th>
-              <th data-s="palier">Palier</th>
-              <th data-s="deplacements">Déplacements/jour</th>
-              <th data-s="tc" class="act">Part transport collectif</th>
-              <th data-s="vitesse">Vitesse commerciale</th>
-              <th data-s="accidents">Accidents</th>
-              <th data-s="couverture">Couverture réseau</th>
-            </tr></thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ RÉSEAU ============ -->
-    <section class="view" id="v-reseau">
-      <div class="card">
-        <div class="ch"><h3>Réseau décrit au format d'échange GTFS</h3><span class="s">Lignes conventionnées et transport artisanal</span></div>
-        <div class="cb" style="padding:14px 16px 0">
-          <p style="font-size:12.5px;color:var(--mute);max-width:80ch">
-            Le référentiel du réseau est publié dans un format standard, réutilisable par toute application tierce.
-            Les itinéraires artisanaux, sans horaires fixes, sont décrits par fréquences observées et par arrêts assortis d'un degré de stabilité.
-          </p>
-        </div>
-        <div class="mtool" id="rtool" style="border-top:1px solid var(--line);margin-top:14px"></div>
-        <div style="position:relative"><div id="map2" style="height:470px;background:var(--line)"></div></div>
-      </div>
-      <div class="cat" id="gtfsinfo"></div>
-    </section>
-
-    <!-- ============ COMPARER ============ -->
-    <section class="view" id="v-compare">
-      <div class="card">
-        <div class="ch"><h3>Comparer deux villes</h3><span class="s">Même méthode, même maille, même année</span></div>
-        <div class="cb">
-          <div class="cmp">
-            <div><label style="font-size:11px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.6px">Ville A</label><select id="selA"></select></div>
-            <div><label style="font-size:11px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.6px">Ville B</label><select id="selB"></select></div>
+          <div class="mode">
+            <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#E8E1D6" stroke-width="9"/>
+            <circle class="rg" cx="30" cy="30" r="24" fill="none" stroke="#D99A0B" stroke-width="9"
+              stroke-dasharray="151" stroke-dashoffset="151" data-pct="11" transform="rotate(-90 30 30)"/></svg>
+            <div><div class="mv">11 %</div><div class="mn">Transport collectif et artisanal</div></div>
           </div>
-          <div class="cmpbars" id="cmpbars"></div>
-          <div class="warnbox" style="margin-top:18px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.4"/></svg>
-            <span>Une comparaison n'a de sens que si les deux villes relèvent du même palier de collecte. Les villes du palier 2 sont renseignées par enquête ponctuelle, celles du palier 1 par mesure continue.</span>
+          <div class="mode">
+            <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#E8E1D6" stroke-width="9"/>
+            <circle class="rg" cx="30" cy="30" r="24" fill="none" stroke="#2E7A5C" stroke-width="9"
+              stroke-dasharray="151" stroke-dashoffset="151" data-pct="7" transform="rotate(-90 30 30)"/></svg>
+            <div><div class="mv">7 %</div><div class="mn">Voiture particulière</div></div>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- ============ DONNÉES ============ -->
-    <section class="view" id="v-donnees">
-      <div class="card">
-        <div class="ch"><h3>Catalogue de données</h3><span class="s">Téléchargement immédiat · sans compte · formats ouverts</span></div>
-        <div class="cb"><div class="cat" id="catalogue"></div></div>
+      <div class="panneau">
+        <div class="ptitre">Accidents corporels par ville</div>
+        <div class="pnote">Cumul de l'année, cinq villes les plus touchées</div>
+        <div class="ville"><span>Ouagadougou</span><span class="barre"><i style="width:100%"></i></span><b>988</b></div>
+        <div class="ville"><span>Bobo-Dioulasso</span><span class="barre"><i style="width:57%"></i></span><b>564</b></div>
+        <div class="ville"><span>Koudougou</span><span class="barre"><i style="width:24%"></i></span><b>238</b></div>
+        <div class="ville"><span>Ouahigouya</span><span class="barre"><i style="width:19%"></i></span><b>188</b></div>
+        <div class="ville"><span>Kaya</span><span class="barre"><i style="width:15%"></i></span><b>146</b></div>
       </div>
-      <div class="card">
-        <div class="ch"><h3>Accès par interface applicative</h3><span class="s">Ressources exposées</span></div>
-        <div class="cb" style="display:flex;flex-direction:column;gap:10px">
-          <p style="font-size:12.5px;color:var(--mute);max-width:82ch">Les mêmes données sont interrogeables par appel programmé. La version est portée dans le chemin ; une version reste servie douze mois après la publication de la suivante.</p>
-          <div class="api">GET /v1/indicateurs?territoire=BF-KAD&amp;periode=2026&amp;maille=commune</div>
-          <div class="api">GET /v1/reseaux/ouagadougou/gtfs.zip</div>
-          <div class="api">GET /v1/jeux-de-donnees?classification=public</div>
-        </div>
-      </div>
-    </section>
+    </div>
+  </div>
+</div></section>
 
-    <!-- ============ QUALITÉ ============ -->
-    <section class="view" id="v-qualite">
-      <div class="card">
-        <div class="ch"><h3>Méthode de chaque indicateur</h3><span class="s">Ce que la valeur mesure, et ce qu'elle ne mesure pas</span></div>
-        <div class="cb"><div id="methodes" style="display:flex;flex-direction:column;gap:10px"></div></div>
-      </div>
-      <div class="card">
-        <div class="ch"><h3>Protection des données</h3></div>
-        <div class="cb" style="font-size:12.5px;color:var(--ink-2);line-height:1.6;max-width:86ch">
-          Aucune donnée permettant d'identifier une personne ou un véhicule n'entre dans la plateforme. L'anonymisation est appliquée au moment de la collecte, avant tout enregistrement.
-          Les indicateurs diffusés sont des agrégats ; toute valeur portant sur un effectif inférieur au seuil minimal n'est pas publiée. Les données issues de l'institut national de la statistique
-          relèvent en outre du secret statistique, régime distinct qui peut interdire la diffusion d'un croisement même anonyme.
-        </div>
-      </div>
-    </section>
+<section id="carte-s"><div class="wrap">
+  <div class="shead">
+    <div>
+      <h2 class="stitre">Le réseau, ville par ville</h2>
+      <p class="sintro">Lignes, arrêts, points de comptage et zones de stationnement. Ce qui est décrit est publié ; ce qui ne l'est pas encore est signalé comme tel.</p>
+    </div>
+    <a class="lien" href="#donnees">Télécharger le référentiel</a>
+  </div>
+  <div id="carte"></div>
+</div></section>
 
-  </main>
+<section class="data" id="publications"><div class="wrap">
+  <div class="shead">
+    <div><h2 class="stitre">Publications et actualités</h2></div>
+    <a class="lien" href="#">Toutes les publications</a>
+  </div>
+  <div class="pubs">
+    <a href="#" class="une">
+      <div class="vign">
+        <svg viewBox="0 0 800 450" role="img" aria-label="Comptage de circulation à un carrefour">
+          <rect width="800" height="450" fill="#1F5641"/>
+          <path d="M0 300 Q200 268 400 292 T800 276 L800 450 L0 450Z" fill="#173F30"/>
+          <g stroke="#D99A0B" stroke-width="3" opacity=".5">
+            <path d="M120 450 L300 240"/><path d="M680 450 L500 240"/>
+          </g>
+          <circle cx="400" cy="212" r="58" fill="none" stroke="#D99A0B" stroke-width="3"/>
+          <circle cx="400" cy="212" r="94" fill="none" stroke="#D99A0B" stroke-width="1.5" opacity=".45"/>
+          <g fill="#F3EFE8">
+            <rect x="336" y="330" width="56" height="18" rx="3"/><rect x="430" y="356" width="40" height="15" rx="3"/>
+            <rect x="250" y="384" width="34" height="13" rx="3"/><rect x="520" y="392" width="48" height="16" rx="3"/>
+          </g>
+          <rect x="392" y="118" width="16" height="96" fill="#0E1F18"/>
+          <rect x="366" y="92" width="68" height="34" rx="4" fill="#0E1F18"/>
+          <circle cx="400" cy="109" r="9" fill="#A8421F"/>
+        </svg>
+      </div>
+      <h3>Ce que révèlent trois mois de comptage au carrefour de l'Université</h3>
+      <p>Le premier point de comptage permanent a enregistré 412 véhicules par quart d'heure en pointe du matin. Deux tiers sont des deux-roues, une proportion supérieure aux hypothèses de l'étude de 2019.</p>
+      <div class="meta">28 août 2026, note d'analyse, 12 pages</div>
+    </a>
+    <ul class="liste">
+      <li><a href="#"><h3>Le référentiel des lignes de Ouagadougou est publié au format d'échange standard</h3>
+        <div class="meta">14 août 2026, jeu de données</div></a></li>
+      <li><a href="#"><h3>Vitesse commerciale : la définition change, les séries antérieures sont recalculées</h3>
+        <div class="meta">2 août 2026, note de méthode</div></a></li>
+      <li><a href="#"><h3>Bobo-Dioulasso : ouverture des relevés de stationnement du centre-ville</h3>
+        <div class="meta">21 juillet 2026, jeu de données</div></a></li>
+      <li><a href="#"><h3>Rapport annuel 2025 de l'Observatoire</h3>
+        <div class="meta">30 juin 2026, rapport, 84 pages</div></a></li>
+      <li><a href="#"><h3>Appel à contribution : cartographie des arrêts du transport artisanal</h3>
+        <div class="meta">12 juin 2026, actualité</div></a></li>
+    </ul>
+  </div>
+</div></section>
 
-  <footer class="pg">
-    <b>ONTU-BF</b><span>·</span><span>Maquette de démonstration du Livrable 3 — les valeurs sont simulées</span><span>·</span>
-    <span>PMDUVS · Groupement IDIAWARE SARL / Data Transport · Financement Banque mondiale</span>
-  </footer>
+<section class="jeux" id="donnees"><div class="wrap">
+  <div class="shead">
+    <div>
+      <h2 class="stitre">Données ouvertes</h2>
+      <p class="sintro">Téléchargement direct, sans compte et sans demande écrite. Sous licence ouverte, avec obligation de citer la source.</p>
+    </div>
+    <a class="lien" href="#" style="color:#D99A0B">Documentation de l'interface</a>
+  </div>
+  <table class="jx">
+    <thead><tr><th>Jeu de données</th><th>Mise à jour</th><th>Formats</th><th></th></tr></thead>
+    <tbody>
+      <tr><td>Référentiel du réseau de transport
+          <small>Lignes, itinéraires, arrêts et gares du transport conventionné et artisanal</small></td>
+        <td>14 août 2026</td><td class="fmt">GTFS, GeoJSON</td><td><a class="dl" href="#">Télécharger</a></td></tr>
+      <tr><td>Comptages de circulation
+          <small>Volumes par point, par quart d'heure et par catégorie de véhicule</small></td>
+        <td>1<sup>er</sup> sept. 2026</td><td class="fmt">CSV, JSON</td><td><a class="dl" href="#">Télécharger</a></td></tr>
+      <tr><td>Accidents corporels
+          <small>Localisation, gravité et catégories d'usagers, agrégés à la maille tronçon</small></td>
+        <td>30 avril 2026</td><td class="fmt">CSV, GeoJSON</td><td><a class="dl" href="#">Télécharger</a></td></tr>
+      <tr><td>Zones de stationnement
+          <small>Offre, capacité et statut, relevées ville par ville</small></td>
+        <td>21 juillet 2026</td><td class="fmt">GeoJSON</td><td><a class="dl" href="#">Télécharger</a></td></tr>
+      <tr><td>Indicateurs de mobilité
+          <small>Valeurs publiées avec leur méthode, leur maille et leur version de calcul</small></td>
+        <td>1<sup>er</sup> sept. 2026</td><td class="fmt">CSV, JSON</td><td><a class="dl" href="#">Télécharger</a></td></tr>
+    </tbody>
+  </table>
+</div></section>
+
+<section id="methode"><div class="wrap">
+  <div class="shead"><div>
+    <h2 class="stitre">Comment ces chiffres sont produits</h2>
+    <p class="sintro">L'Observatoire ne fait rouler aucun véhicule et ne réglemente rien. Il rassemble ce que produisent les administrations, les opérateurs et les équipements, le vérifie et le publie.</p>
+  </div></div>
+  <div class="gr">
+    <div class="panneau">
+      <div class="ptitre">Ce qui est publié</div>
+      <div class="pnote">Et à quelles conditions</div>
+      <p style="color:#5C6660;margin-bottom:14px">Une valeur n'est publiée qu'accompagnée de sa source, de sa maille géographique, de sa date de production et de sa méthode de calcul. Une valeur sans méthode n'est pas un indicateur.</p>
+      <p style="color:#5C6660">Lorsqu'une méthode change, les valeurs antérieures sont recalculées et la version est signalée. Les séries restent comparables d'un bout à l'autre.</p>
+    </div>
+    <div class="panneau">
+      <div class="ptitre">Ce qui n'est pas publié</div>
+      <div class="pnote">Et pourquoi</div>
+      <p style="color:#5C6660;margin-bottom:14px">Aucune image de voie publique. Aucune plaque d'immatriculation. Aucun trajet rattachable à une personne ou à un véhicule nommément désigné.</p>
+      <p style="color:#5C6660">Les équipements de comptage transmettent des décomptes, jamais des images. Les identifiants sont remplacés dès la réception et ne peuvent plus être reconstitués après sept jours.</p>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="fgrid">
+    <div>
+      <h4>Observatoire national des transports urbains</h4>
+      <p style="color:#5C6660;max-width:38ch">Dispositif national de suivi de la mobilité urbaine, couvrant les dix-sept chefs-lieux de région du Burkina Faso.</p>
+    </div>
+    <div><h4>Consulter</h4><ul>
+      <li><a href="#indicateurs">Indicateurs</a></li><li><a href="#carte-s">Carte du réseau</a></li>
+      <li><a href="#publications">Publications</a></li><li><a href="#donnees">Données ouvertes</a></li></ul></div>
+    <div><h4>Comprendre</h4><ul>
+      <li><a href="#methode">Méthode</a></li><li><a href="#">Référentiel d'indicateurs</a></li>
+      <li><a href="#">Producteurs de données</a></li><li><a href="#">Licence de réutilisation</a></li></ul></div>
+    <div><h4>Participer</h4><ul>
+      <li><a href="#">Devenir producteur</a></li><li><a href="#">Contribuer à la cartographie</a></li>
+      <li><a href="mobile.html">Application de collecte</a></li><li><a href="#">Nous écrire</a></li></ul></div>
+  </div>
+  <div class="fbas">
+    <span>Maquette produite dans le cadre de l'étude de mise en place de l'ONTU-BF</span>
+    <span>Toutes les valeurs affichées sont simulées</span>
+  </div>
+</div></footer>
+
+
+<!-- ═══════════ connexion ═══════════ -->
+<div class="modal" id="modal">
+  <div class="mbox">
+    <button class="mclose" onclick="fermer()" aria-label="Fermer">×</button>
+    <h3>Se connecter</h3>
+    <p>L'accès aux vues internes est nominatif. Chaque consultation est enregistrée avec son auteur, sa date et son motif.</p>
+    <div class="champ"><label for="id">Identifiant</label><input id="id" value="j.korsaga@ontu.bf"></div>
+    <div class="champ"><label for="mp">Mot de passe</label><input id="mp" type="password" value="••••••••••"></div>
+    <div class="champ"><label>Choisir le profil à simuler</label>
+      <div class="prof">
+        <button onclick="ouvrir('decideur')"><b>Décideur</b><span>Synthèse et tendances</span></button>
+        <button onclick="ouvrir('exploitant')"><b>Exploitant</b><span>Salle de contrôle</span></button>
+        <button onclick="ouvrir('analyste')"><b>Analyste</b><span>Exploration et calcul</span></button>
+        <button onclick="ouvrir('producteur')"><b>Producteur</b><span>Suivi des transmissions</span></button>
+        <button onclick="ouvrir('collectivite')"><b>Collectivité</b><span>Mon territoire</span></button>
+        <button onclick="ouvrir('admin')"><b>Administrateur</b><span>Comptes et habilitations</span></button>
+      </div>
+    </div>
+    <p class="fin">Maquette : aucun mot de passe n'est vérifié. Le second facteur exigé en exploitation n'est pas simulé.</p>
+  </div>
 </div>
+
+<!-- ═══════════ espace authentifié ═══════════ -->
+<div id="app">
+  <div class="abar"><div class="abarin">
+    <a href="#" class="logo" onclick="deconnecter();return false">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="19" fill="#2E7A5C"/>
+        <circle cx="20" cy="20" r="11.5" fill="none" stroke="#131E1A" stroke-width="2.4"/>
+        <circle cx="20" cy="20" r="4" fill="#D99A0B"/>
+        <path d="M20 1v6M20 33v6M1 20h6M33 20h6" stroke="#131E1A" stroke-width="2.4"/>
+      </svg>
+      <span style="color:#fff"><b>ONTU-BF</b><i style="color:#8C948F">Espace de travail</i></span>
+    </a>
+    <div class="who"><b id="wnom">—</b><span id="wrole">—</span></div>
+    <button class="dec" onclick="deconnecter()">Se déconnecter</button>
+  </div></div>
+  <div class="atabs"><div class="atabsin" id="onglets"></div></div>
+  <div class="acorps" id="acorps"></div>
+</div>
+
+<div class="demo" id="demo">
+  <button class="x" onclick="document.getElementById('demo').remove()" aria-label="Fermer">×</button>
+  <b>Maquette de démonstration</b>
+  Les valeurs sont simulées. Les visuels sont des illustrations, en attente des photographies.
+  <select id="profil">
+    <option>Vue publique</option><option>Décideur</option><option>Exploitant</option>
+    <option>Analyste</option><option>Producteur</option><option>Collectivité</option><option>Administrateur</option>
+  </select>
+</div>
+
+<div class="nav2">
+  <span>Maquettes</span>
+  <a href="./index.html" style="background:#1F5641">Portail</a>
+  <a href="./mobile.html" style="background:#2A3833;margin-left:4px">Mobile</a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-/* ================= Données simulées ================= */
-const VILLES=[
- {n:"Ouagadougou",r:"Centre",code:"BF-KAD",lat:12.371,lon:-1.519,pal:1,pop:2900000,dep:4120000,tc:31,vit:16,acc:1180,cov:74,art:62,stab:81},
- {n:"Bobo-Dioulasso",r:"Hauts-Bassins",code:"BF-HBS",lat:11.178,lon:-4.297,pal:1,pop:1120000,dep:1480000,tc:22,vit:19,acc:412,cov:58,art:71,stab:66},
- {n:"Koudougou",r:"Centre-Ouest",code:"BF-CRO",lat:12.252,lon:-2.362,pal:1,pop:160000,dep:212000,tc:11,vit:23,acc:96,cov:34,art:78,stab:52},
- {n:"Ouahigouya",r:"Nord",code:"BF-NRD",lat:13.583,lon:-2.421,pal:2,pop:135000,dep:171000,tc:9,vit:24,acc:74,cov:28,art:80,stab:44},
- {n:"Kaya",r:"Centre-Nord",code:"BF-CNR",lat:13.092,lon:-1.084,pal:2,pop:128000,dep:158000,tc:8,vit:24,acc:69,cov:26,art:82,stab:41},
- {n:"Banfora",r:"Cascades",code:"BF-CAS",lat:10.633,lon:-4.762,pal:2,pop:117000,dep:142000,tc:8,vit:25,acc:52,cov:25,art:81,stab:43},
- {n:"Tenkodogo",r:"Centre-Est",code:"BF-CES",lat:11.780,lon:-0.369,pal:2,pop:75000,dep:91000,tc:7,vit:26,acc:44,cov:21,art:84,stab:38},
- {n:"Fada N'Gourma",r:"Est",code:"BF-EST",lat:12.061,lon:0.358,pal:2,pop:82000,dep:99000,tc:7,vit:25,acc:58,cov:22,art:83,stab:39},
- {n:"Dédougou",r:"Boucle du Mouhoun",code:"BF-BMH",lat:12.463,lon:-3.460,pal:2,pop:72000,dep:87000,tc:6,vit:26,acc:47,cov:20,art:85,stab:37},
- {n:"Dori",r:"Sahel",code:"BF-SHL",lat:14.033,lon:-0.033,pal:2,pop:68000,dep:79000,tc:5,vit:27,acc:31,cov:17,art:86,stab:33},
- {n:"Gaoua",r:"Sud-Ouest",code:"BF-SOU",lat:10.297,lon:-3.183,pal:2,pop:52000,dep:61000,tc:5,vit:27,acc:26,cov:16,art:87,stab:32},
- {n:"Ziniaré",r:"Plateau-Central",code:"BF-PCL",lat:12.581,lon:-1.297,pal:2,pop:41000,dep:53000,tc:6,vit:26,acc:29,cov:19,art:84,stab:36},
- {n:"Manga",r:"Centre-Sud",code:"BF-CSD",lat:11.664,lon:-1.073,pal:2,pop:38000,dep:45000,tc:5,vit:27,acc:22,cov:15,art:86,stab:31},
- {n:"Djibo",r:"Sahel (Soum)",code:"BF-SOM",lat:14.100,lon:-1.630,pal:2,pop:44000,dep:50000,tc:4,vit:28,acc:18,cov:12,art:88,stab:27},
- {n:"Nouna",r:"Kossi",code:"BF-KOS",lat:12.729,lon:-3.863,pal:2,pop:36000,dep:42000,tc:4,vit:28,acc:20,cov:13,art:88,stab:29},
- {n:"Léo",r:"Sissili",code:"BF-SIS",lat:11.100,lon:-2.100,pal:2,pop:39000,dep:46000,tc:5,vit:27,acc:21,cov:14,art:87,stab:30},
- {n:"Pô",r:"Nahouri",code:"BF-NAH",lat:11.170,lon:-1.150,pal:2,pop:33000,dep:39000,tc:5,vit:27,acc:19,cov:14,art:86,stab:30},
+const SL=[
+ {t:"Six millions neuf cent mille déplacements par jour",
+  s:"L'Observatoire rassemble, vérifie et publie les données de mobilité des dix-sept chefs-lieux de région. Chaque chiffre porte sa méthode et sa date.",
+  c:"Échangeur de l'Est, Ouagadougou"},
+ {t:"Deux déplacements sur trois se font à deux-roues",
+  s:"Le transport artisanal assure l'essentiel de la mobilité urbaine burkinabè. L'Observatoire le décrit pour la première fois de manière systématique.",
+  c:"Rond-point des Nations Unies, Ouagadougou"},
+ {t:"Ce qui se construit aujourd'hui se mesure demain",
+  s:"Les nouveaux corridors routiers entrent au référentiel dès leur mise en service. Le réseau décrit suit le réseau réel.",
+  c:"Corridor Ouagadougou – Bobo-Dioulasso"}
 ];
-
-/* Séries 2022→2026, déterministes */
-function serie(v,cle){
-  const base={dep:v.dep,tc:v.tc,vit:v.vit,acc:v.acc,cov:v.cov}[cle];
-  const pente={dep:.042,tc:.055,vit:-.021,acc:.028,cov:.085}[cle];
-  const bruit=(v.n.length%5)/100;
-  return [0,1,2,3,4].map(i=>{
-    const t=(i-4);
-    let x=base*(1+pente*t)+base*bruit*Math.sin(i+v.lat);
-    return cle==='tc'||cle==='cov'?Math.max(1,Math.round(x)):Math.round(x);
-  });
+let cur=0,timer;
+const sl=[...document.querySelectorAll('.slide')],dots=[...document.querySelectorAll('.dot')];
+function go(i){
+  sl[cur].classList.remove('on');dots[cur].classList.remove('on');
+  cur=i;sl[cur].classList.add('on');dots[cur].classList.add('on');
+  document.getElementById('htitre').textContent=SL[i].t;
+  document.getElementById('hsub').textContent=SL[i].s;
+  document.getElementById('hcredit').textContent=SL[i].c;
 }
-const ANNEES=[2022,2023,2024,2025,2026];
-VILLES.forEach(v=>{v.s={};['dep','tc','vit','acc','cov'].forEach(k=>v.s[k]=serie(v,k));});
+const calme=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+function relance(){clearInterval(timer);if(!calme)timer=setInterval(()=>go((cur+1)%sl.length),7000);}
+dots.forEach(d=>d.addEventListener('click',()=>{go(+d.dataset.i);relance()}));
+relance();
 
-/* Indicateurs : métadonnées réelles du dispositif */
-const IND={
- dep:{lab:"Déplacements par jour",court:"Déplacements",unite:"dépl./jour",maille:"Agglomération",src:"Enquête ménages INSD + comptages ONTU",prod:"2026-06",cls:"public",freq:"Annuelle",meth:"Nombre de déplacements tous modes, tous motifs, un jour ouvrable moyen. Redressement sur la population recensée. Exclut les déplacements de moins de 5 minutes à l'intérieur d'une même parcelle.",fmt:v=>v.toLocaleString('fr-FR'),max:4200000,inv:false},
- tc:{lab:"Part du transport collectif",court:"Part TC",unite:"%",maille:"Agglomération",src:"SOTRACO (validations agrégées) + enquête ménages",prod:"2026-05",cls:"public",freq:"Trimestrielle",meth:"Part des déplacements motorisés réalisés en transport collectif conventionné ou artisanal. Les validations billettiques sont transmises agrégées par ligne, arrêt et plage horaire ; aucun titre individuel n'est transmis.",fmt:v=>v+" %",max:35,inv:false},
- vit:{lab:"Vitesse commerciale",court:"Vitesse comm.",unite:"km/h",maille:"Ligne",src:"Positions véhicules SOTRACO, anonymisées à la collecte",prod:"2026-08",cls:"public",freq:"Mensuelle",meth:"Vitesse moyenne d'un véhicule de transport collectif sur sa ligne, arrêts compris, en heure de pointe du matin. Calculée sur agrégats de temps de parcours par tronçon ; aucune trace de véhicule identifié n'est conservée au-delà de deux mois.",fmt:v=>v+" km/h",max:30,inv:true},
- acc:{lab:"Accidents corporels",court:"Accidents",unite:"cas/an",maille:"Commune",src:"ONASER — fichier accidents géolocalisé",prod:"2026-04",cls:"public",freq:"Mensuelle",meth:"Accidents de la circulation ayant fait au moins un blessé, déclarés et géolocalisés. Sous-déclaration probable dans les villes du palier 2, où le relevé dépend du poste de police.",fmt:v=>v.toLocaleString('fr-FR'),max:1200,inv:false},
- cov:{lab:"Couverture du réseau décrit",court:"Couverture réseau",unite:"%",maille:"Agglomération",src:"Référentiel GTFS ONTU / OSM-BF",prod:"2026-07",cls:"public",freq:"Continue",meth:"Part des itinéraires de transport collectif effectivement relevés et publiés au format d'échange, rapportée aux itinéraires recensés. Un itinéraire n'est compté que si ses arrêts sont positionnés et son degré de stabilité renseigné.",fmt:v=>v+" %",max:100,inv:true},
-};
-
-/* Fraîcheur : dates de production hétérogènes, c'est le point */
-const FRAICHEUR=[
- {k:"Vitesse commerciale",d:"2026-08"},{k:"Couverture réseau",d:"2026-07"},{k:"Déplacements/jour",d:"2026-06"},
- {k:"Part transport collectif",d:"2026-05"},{k:"Accidents corporels",d:"2026-04"},{k:"Parc de véhicules",d:"2025-11"},
- {k:"Coût du déplacement",d:"2025-03"},{k:"Enquête ménages",d:"2024-09"},{k:"Externalités",d:"2023-12"},
-];
-const AUJ=new Date(2026,7,23);
-function mois(d){const [y,m]=d.split('-').map(Number);return (AUJ.getFullYear()-y)*12+(AUJ.getMonth()+1-m);}
-
-/* Catalogue */
-const JEUX=[
- {t:"Indicateurs de mobilité — 17 villes",d:"Les cinq indicateurs du référentiel national, par ville et par année, de 2022 à 2026.",tags:["CSV","JSON","public"],cls:"pub",cle:"indicateurs"},
- {t:"Réseau de transport collectif — Ouagadougou",d:"Lignes, arrêts, fréquences observées et degré de stabilité, au format d'échange standard.",tags:["GTFS","GeoJSON","public"],cls:"pub",cle:"reseau"},
- {t:"Accidents corporels géolocalisés",d:"Points d'accident agrégés à la maille du carrefour, seuil minimal de trois cas par maille.",tags:["CSV","GeoJSON","public"],cls:"pub",cle:"accidents"},
- {t:"Points de comptage — relevés horaires",d:"Agrégats par pas de quinze minutes, par point fixe, sans identification de véhicule.",tags:["CSV","public"],cls:"pub",cle:"comptage"},
- {t:"Fréquentation par ligne et par arrêt",d:"Validations agrégées transmises par l'opérateur. Accès nominatif au titre de la convention d'échange.",tags:["CSV","restreint"],cls:"res",cle:"frequentation"},
- {t:"Matrices origine-destination par zone",d:"Matrices calculées chez l'opérateur télécom et transmises agrégées. Jeu valorisable sous licence.",tags:["CSV","commercialisable"],cls:"com",cle:"od"},
-];
-
-/* ================= Utilitaires ================= */
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-function couleur(t,inv){ // 0..1 -> rouge..vert (ou inverse)
-  let x=Math.max(0,Math.min(1,t)); if(!inv)x=1-x;
-  const st=[[176,58,46],[176,124,12],[11,107,88]];
-  const s=x<.5?0:1, l=x<.5?x/.5:(x-.5)/.5, a=st[s],b=st[s+1];
-  return `rgb(${Math.round(a[0]+(b[0]-a[0])*l)},${Math.round(a[1]+(b[1]-a[1])*l)},${Math.round(a[2]+(b[2]-a[2])*l)})`;
-}
-let indic='tc', annee=2026, sel=VILLES[0], tri='tc', sens=-1, couche={artisanal:true,conventionne:true,comptage:true};
-const val=(v,k,a)=>v.s[k][ANNEES.indexOf(a||annee)];
-
-/* ================= Fraîcheur ================= */
-function rendFraicheur(){
-  $('#ftrack').innerHTML=FRAICHEUR.map(f=>{
-    const m=mois(f.d), c=m<=6?'f-ok':m<=18?'f-mid':'f-old';
-    const [y,mm]=f.d.split('-');
-    const lib=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."][+mm-1];
-    return `<div class="fcell ${c}" title="Produit en ${lib} ${y} — ${m} mois">
-      <div class="fk">${f.k}</div><div class="fd">${lib} ${y} · ${m} m</div></div>`;
-  }).join('');
-  const rec=FRAICHEUR.reduce((a,b)=>mois(a.d)<mois(b.d)?a:b);
-  $('#tag-maj').textContent="Dernière mise à jour : "+rec.d.replace('-','/');
-}
-
-/* ================= KPI ================= */
-function rendKPI(){
-  const p1=VILLES.filter(v=>v.pal===1);
-  const totDep=VILLES.reduce((s,v)=>s+val(v,'dep'),0);
-  const tcMoy=Math.round(p1.reduce((s,v)=>s+val(v,'tc'),0)/p1.length);
-  const acc=VILLES.reduce((s,v)=>s+val(v,'acc'),0);
-  const cov=Math.round(VILLES.reduce((s,v)=>s+val(v,'cov'),0)/VILLES.length);
-  const data=[
-    {k:"Déplacements par jour",v:(totDep/1e6).toFixed(2).replace('.',','),u:" M",m:"17 villes · enquête + comptages",cls:"public",serie:ANNEES.map(a=>VILLES.reduce((s,v)=>s+val(v,'dep',a),0))},
-    {k:"Part du transport collectif",v:tcMoy,u:" %",m:"palier 1 seulement · non extrapolé",cls:"public",serie:ANNEES.map(a=>Math.round(p1.reduce((s,v)=>s+val(v,'tc',a),0)/p1.length))},
-    {k:"Accidents corporels",v:acc.toLocaleString('fr-FR'),m:"source ONASER · sous-déclaration palier 2",cls:"public",serie:ANNEES.map(a=>VILLES.reduce((s,v)=>s+val(v,'acc',a),0))},
-    {k:"Couverture du réseau décrit",v:cov,u:" %",m:"référentiel GTFS · mise à jour continue",cls:"public",serie:ANNEES.map(a=>Math.round(VILLES.reduce((s,v)=>s+val(v,'cov',a),0)/VILLES.length))},
-  ];
-  $('#kpis').innerHTML=data.map(d=>`
-    <div class="kpi">
-      <div class="k">${d.k} <b style="background:var(--vert-l);color:var(--vert-d)">PUBLIC</b></div>
-      <div class="v">${d.v}${d.u?`<span>${d.u}</span>`:''}</div>
-      ${sparkline(d.serie)}
-      <div class="m">${d.m}</div>
-    </div>`).join('');
-}
-function sparkline(s){
-  const w=190,h=26,mn=Math.min(...s),mx=Math.max(...s),r=(mx-mn)||1;
-  const pts=s.map((y,i)=>`${(i/(s.length-1)*w).toFixed(1)},${(h-((y-mn)/r)*(h-4)-2).toFixed(1)}`).join(' ');
-  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-    <polyline points="${pts}" fill="none" stroke="var(--vert)" stroke-width="1.6" stroke-linejoin="round"/>
-    <circle cx="${w}" cy="${(h-((s[s.length-1]-mn)/r)*(h-4)-2).toFixed(1)}" r="2.4" fill="var(--or)"/></svg>`;
-}
-
-/* ================= Carte ================= */
-let map,couches,map2,ok=true;
-try{
-  map=L.map('map',{zoomControl:true}).setView([12.5,-1.9],6.3);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    {attribution:'© OpenStreetMap · © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
-  couches=L.layerGroup().addTo(map);
-}catch(e){ok=false;$('#map').style.display='none';$('#nomap').style.display='flex';}
-
-function rendCarte(){
-  if(!ok)return;
-  couches.clearLayers();
-  const I=IND[indic];
-  VILLES.forEach(v=>{
-    const x=val(v,indic), c=couleur(x/I.max,I.inv);
-    const t=v.pal===1?22:14;
-    const html=`<div class="mk ${v===sel?'sel':''} ${v.pal===1?'p1':''}" style="--c:${c}"></div>`;
-    const m=L.marker([v.lat,v.lon],{icon:L.divIcon({html,className:'mk-w',iconSize:[t,t],iconAnchor:[t/2,t/2]})});
-    m.bindTooltip(`<b>${v.n}</b> · ${I.fmt(x)}<br><span style="opacity:.7;font-weight:400">${I.lab} · ${annee}</span>`,
-      {direction:'top',offset:[0,-t/2],className:'tip'});
-    m.on('click',()=>{sel=v;rendTout();map.panTo([v.lat,v.lon]);});
-    m.addTo(couches);
-  });
-}
-function rendLeg(){
-  const I=IND[indic];
-  $('#leg').innerHTML=`<div class="lt">${I.lab} — ${I.unite}</div>`+
-   [[0,'Faible'],[.5,'Moyen'],[1,'Élevé']].map(([t,l])=>
-     `<div class="lr"><span class="sw" style="background:${couleur(t,I.inv)}"></span>${l}</div>`).join('')+
-   `<div class="lr" style="margin-top:7px;padding-top:6px;border-top:1px solid var(--line)">
-      <span class="sw" style="background:var(--faint);border-color:var(--ink);border-width:2px"></span>Palier 1 · mesure continue</div>`;
-}
-function rendOutils(){
-  $('#mtool').innerHTML=Object.entries(IND).map(([k,v])=>
-    `<button class="chip ${k===indic?'on':''}" data-i="${k}">${v.court}</button>`).join('');
-  $$('#mtool .chip').forEach(b=>b.onclick=()=>{indic=b.dataset.i;tri=b.dataset.i;sens=-1;rendTout();});
-}
-
-/* ================= Fiche ================= */
-function rendFiche(){
-  const v=sel,I=IND[indic],x=val(v,indic);
-  const cls=VILLES.filter(a=>a.pal===v.pal).sort((a,b)=>val(b,indic)-val(a,indic));
-  const rang=cls.indexOf(v)+1;
-  $('#fiche-cls').textContent="Classification : public";
-  const s=v.s[indic];
-  const ev=s[4]-s[0], pc=s[0]?Math.round(ev/s[0]*100):0;
-  $('#fiche').innerHTML=`
-   <div class="nm">${v.n}</div>
-   <div class="rg">Région ${v.r} · code territoire <span style="font-family:var(--mono)">${v.code}</span></div>
-   <span class="bdg" style="background:${v.pal===1?'var(--vert-l)':'var(--paper)'};color:${v.pal===1?'var(--vert-d)':'var(--mute)'}">
-     ${v.pal===1?'Palier 1 · mesure continue':'Palier 2 · enquête ponctuelle'}</span>
-   <div class="gg">
-     <div class="gl"><span>${I.lab} — ${annee}</span><b>${I.fmt(x)}</b></div>
-     <div class="tr"><div class="fl" style="width:${Math.min(100,x/I.max*100)}%;background:${couleur(x/I.max,I.inv)}"></div></div>
-   </div>
-   ${courbe(s)}
-   <div class="meta">
-     <div class="mr"><span class="mk2">Rang</span><span class="mv">${rang} / ${cls.length} au sein du palier ${v.pal}</span></div>
-     <div class="mr"><span class="mk2">Évolution</span><span class="mv">${ev>0?'+':''}${pc} % entre 2022 et 2026</span></div>
-     <div class="mr"><span class="mk2">Maille</span><span class="mv">${I.maille}</span></div>
-     <div class="mr"><span class="mk2">Source</span><span class="mv">${I.src}</span></div>
-     <div class="mr"><span class="mk2">Produit en</span><span class="mv mono">${I.prod}</span></div>
-     <div class="mr"><span class="mk2">Fréquence</span><span class="mv">${I.freq}</span></div>
-   </div>
-   ${v.pal===2?`<div class="warnbox">
-     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.4"/></svg>
-     <span>Ville du palier 2 : valeur reconstituée par enquête ponctuelle et non par mesure continue. À ne pas comparer directement à une ville du palier 1.</span></div>`:''}
-   <div class="dlrow">
-     <button class="dl" onclick="telecharger('ville')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>Série de cette ville (CSV)</button>
-     <button class="dl" onclick="telecharger('indicateurs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>Toutes les villes (CSV)</button>
-   </div>`;
-}
-function courbe(s){
-  const w=300,h=76,mn=Math.min(...s)*.94,mx=Math.max(...s)*1.04,r=(mx-mn)||1;
-  const X=i=>18+i/(s.length-1)*(w-30), Y=y=>h-14-((y-mn)/r)*(h-30);
-  const line=s.map((y,i)=>`${X(i).toFixed(1)},${Y(y).toFixed(1)}`).join(' ');
-  const aire=`18,${h-14} ${line} ${X(s.length-1)},${h-14}`;
-  const cur=ANNEES.indexOf(annee);
-  return `<svg class="serie" viewBox="0 0 ${w} ${h}" style="margin-top:12px">
-    <polygon points="${aire}" fill="rgba(11,107,88,.09)"/>
-    <polyline points="${line}" fill="none" stroke="var(--vert)" stroke-width="2" stroke-linejoin="round"/>
-    ${s.map((y,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(y).toFixed(1)}" r="${i===cur?4:2.6}"
-        fill="${i===cur?'var(--or)':'var(--vert)'}"/>`).join('')}
-    ${ANNEES.map((a,i)=>`<text x="${X(i).toFixed(1)}" y="${h-2}" text-anchor="middle"
-        font-family="JetBrains Mono" font-size="9" fill="${i===cur?'#B07C0C':'#93A29B'}">${a}</text>`).join('')}
-  </svg>`;
-}
-
-/* ================= Table ================= */
-function rendTable(){
-  const I=IND[indic];
-  const l=[...VILLES].sort((a,b)=>{
-    if(tri==='name')return sens*a.n.localeCompare(b.n);
-    if(tri==='palier')return sens*(a.pal-b.pal);
-    const k={deplacements:'dep',tc:'tc',vitesse:'vit',accidents:'acc',couverture:'cov'}[tri]||tri;
-    return sens*(val(a,k)-val(b,k));
-  });
-  $('#tbody').innerHTML=l.map(v=>{
-    const c=couleur(val(v,indic)/I.max,I.inv);
-    return `<tr data-n="${v.n}" class="${v===sel?'sel':''}">
-      <td><span class="cn"><span class="d" style="background:${c}"></span>${v.n}${v.pal===1?'<span class="p">P1</span>':''}</span></td>
-      <td>${v.pal}</td>
-      <td>${val(v,'dep').toLocaleString('fr-FR')}</td>
-      <td><span class="pill" style="background:${couleur(val(v,'tc')/35,false)}1f;color:${couleur(val(v,'tc')/35,false)}">${val(v,'tc')} %</span></td>
-      <td>${val(v,'vit')} km/h</td>
-      <td>${val(v,'acc').toLocaleString('fr-FR')}</td>
-      <td><span class="pill" style="background:${couleur(val(v,'cov')/100,true)}1f;color:${couleur(val(v,'cov')/100,true)}">${val(v,'cov')} %</span></td>
-    </tr>`;}).join('');
-  $$('#tbody tr').forEach(tr=>tr.onclick=()=>{sel=VILLES.find(v=>v.n===tr.dataset.n);rendTout();if(ok)map.panTo([sel.lat,sel.lon]);});
-  $$('thead th').forEach(th=>th.classList.toggle('act',th.dataset.s===tri));
-}
-
-/* ================= Réseau (carte 2) ================= */
-const LIGNES=[
- {n:"Ligne 1 — Tampouy ↔ Zone du Bois",t:"conventionne",pts:[[12.408,-1.556],[12.395,-1.539],[12.375,-1.522],[12.362,-1.499],[12.356,-1.478]]},
- {n:"Ligne 4 — Gounghin ↔ Ouaga 2000",t:"conventionne",pts:[[12.366,-1.549],[12.358,-1.531],[12.340,-1.512],[12.318,-1.497],[12.302,-1.488]]},
- {n:"Ligne 8 — Dapoya ↔ Pissy",t:"conventionne",pts:[[12.390,-1.523],[12.378,-1.541],[12.365,-1.566],[12.352,-1.588],[12.345,-1.606]]},
- {n:"Itinéraire artisanal A — Rood Woko ↔ Saaba",t:"artisanal",pts:[[12.372,-1.517],[12.380,-1.494],[12.386,-1.466],[12.392,-1.437],[12.398,-1.408]]},
- {n:"Itinéraire artisanal B — Kossodo ↔ Centre",t:"artisanal",pts:[[12.421,-1.478],[12.404,-1.491],[12.389,-1.505],[12.376,-1.516]]},
- {n:"Itinéraire artisanal C — Bonheur-Ville ↔ Gare",t:"artisanal",pts:[[12.330,-1.560],[12.345,-1.548],[12.358,-1.535],[12.370,-1.520]]},
-];
-const COMPTAGE=[[12.372,-1.518,"Rond-point des Nations unies"],[12.389,-1.531,"Avenue Kwame N'Krumah"],
- [12.356,-1.500,"Boulevard Charles de Gaulle"],[12.401,-1.510,"Route de Kaya, PK3"],[12.348,-1.566,"Avenue Bassawarga"]];
-let map2ok=true;
-function initMap2(){
-  if(map2||!map2ok)return;
-  try{
-    map2=L.map('map2').setView([12.375,-1.515],12.4);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      {attribution:'© OpenStreetMap · © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map2);
-    map2.lay=L.layerGroup().addTo(map2);
-    setTimeout(()=>map2.invalidateSize(),120);
-  }catch(e){map2ok=false;return;}
-  rendReseau();
-}
-function rendReseau(){
-  if(!map2)return;
-  map2.lay.clearLayers();
-  LIGNES.forEach(l=>{
-    if(!couche[l.t])return;
-    const conv=l.t==='conventionne';
-    L.polyline(l.pts,{color:conv?'#0B6B58':'#B07C0C',weight:conv?5:3.5,opacity:.9,
-      dashArray:conv?null:'7,6'}).bindTooltip(`<b>${l.n}</b><br><span style="opacity:.75;font-weight:400">${conv?'Ligne conventionnée · horaires publiés':'Transport artisanal · fréquence observée'}</span>`,{className:'tip',sticky:true}).addTo(map2.lay);
-    l.pts.forEach((p,i)=>{
-      L.circleMarker(p,{radius:conv?4.5:3.5,color:'#fff',weight:1.6,fillColor:conv?'#0B6B58':'#B07C0C',fillOpacity:1})
-       .bindTooltip(`Arrêt ${i+1} · ${conv?'position confirmée':'stabilité moyenne'}`,{className:'tip'}).addTo(map2.lay);
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(!e.isIntersecting)return;
+    e.target.querySelectorAll('.rg').forEach(c=>{
+      const tot=parseFloat(c.getAttribute('stroke-dasharray'));
+      const off=tot*(1-c.dataset.pct/100);
+      if(calme){c.style.strokeDashoffset=off;return;}
+      c.style.transition='stroke-dashoffset 1.1s cubic-bezier(.22,.9,.3,1)';
+      requestAnimationFrame(()=>c.style.strokeDashoffset=off);
     });
+    io.unobserve(e.target);
   });
-  if(couche.comptage) COMPTAGE.forEach(([la,lo,n])=>{
-    L.marker([la,lo],{icon:L.divIcon({html:`<div class="mk" style="--c:#2C6E9B"></div>`,className:'mk-w',iconSize:[15,15],iconAnchor:[7.5,7.5]})})
-     .bindTooltip(`<b>Point de comptage</b><br><span style="opacity:.75;font-weight:400">${n} · agrégats 15 min</span>`,{className:'tip'}).addTo(map2.lay);
-  });
-}
-function rendRtool(){
-  $('#rtool').innerHTML=`
-    <button class="chip ${couche.conventionne?'on':''}" data-c="conventionne">Lignes conventionnées</button>
-    <button class="chip ${couche.artisanal?'on':''}" data-c="artisanal">Transport artisanal</button>
-    <button class="chip ${couche.comptage?'on':''}" data-c="comptage">Points de comptage</button>
-    <span class="sep"></span>
-    <span style="font-size:11.5px;color:var(--mute)">Ouagadougou · extrait du référentiel</span>`;
-  $$('#rtool .chip').forEach(b=>b.onclick=()=>{couche[b.dataset.c]=!couche[b.dataset.c];rendRtool();rendReseau();});
-  $('#gtfsinfo').innerHTML=`
-   <div class="ds"><h4>Pourquoi un format d'échange standard</h4>
-     <div class="dd">Décrire le réseau dans un format reconnu permet à n'importe quelle application tierce de l'utiliser sans convention préalable. C'est la condition pour que le travail de relevé serve au-delà de l'Observatoire.</div>
-     <div class="dt"><span class="tg">GTFS</span><span class="tg">GTFS-RT</span><span class="tg">SIRI</span><span class="tg pub">public</span></div></div>
-   <div class="ds"><h4>Le cas du transport artisanal</h4>
-     <div class="dd">Les itinéraires sans horaires fixes sont décrits par fréquences observées, avec pour chaque arrêt un degré de stabilité. Un arrêt utilisé tous les jours et un arrêt de saison sèche ne sont pas la même information.</div>
-     <div class="dt"><span class="tg">fréquences</span><span class="tg">degré de stabilité</span><span class="tg">variantes d'itinéraire</span></div>
-     <button class="dl" style="align-self:flex-start" onclick="telecharger('reseau')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>Extrait du référentiel (CSV)</button></div>`;
+},{threshold:.3});
+document.querySelectorAll('#anneaux,.modes').forEach(n=>io.observe(n));
+
+if(typeof L!=='undefined'){
+const m=L.map('carte',{scrollWheelZoom:false}).setView([12.368,-1.527],12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  {attribution:'&copy; OpenStreetMap, &copy; CARTO',maxZoom:18}).addTo(m);
+const A=[[12.396,-1.560],[12.386,-1.542],[12.375,-1.528],[12.364,-1.514],[12.352,-1.498],[12.341,-1.482]];
+const B=[[12.330,-1.560],[12.344,-1.548],[12.358,-1.534],[12.372,-1.518],[12.386,-1.502]];
+L.polyline(A,{color:'#1F5641',weight:5}).addTo(m).bindPopup("Ligne 4, Tanghin vers Zone du Bois<br>Relevée le 14 août 2026");
+L.polyline(B,{color:'#A8421F',weight:5}).addTo(m).bindPopup("Ligne 12, Gounghin vers Karpala<br>Relevée le 2 août 2026");
+A.concat(B).forEach(p=>L.circleMarker(p,{radius:4.5,color:'#131E19',weight:1.5,fillColor:'#F3EFE8',fillOpacity:1}).addTo(m));
+L.circleMarker([12.368,-1.527],{radius:10,color:'#D99A0B',weight:3,fillColor:'#D99A0B',fillOpacity:.35}).addTo(m)
+  .bindPopup("Point de comptage 01<br>Carrefour de l'Université<br>412 véhicules par quart d'heure en pointe");
+L.circleMarker([12.352,-1.545],{radius:10,color:'#D99A0B',weight:3,fillColor:'#D99A0B',fillOpacity:.35}).addTo(m)
+  .bindPopup("Point de comptage 02<br>Avenue Kwame N'Krumah<br>287 véhicules par quart d'heure en pointe");
+}else{
+  document.getElementById('carte').innerHTML=
+   '<div style="height:100%;display:grid;place-items:center;color:#8C948F;font-size:14.5px;text-align:center;padding:24px">'+
+   'La carte se charge depuis Internet.<br>Ouvrez la page une fois connecté pour la voir.</div>';
 }
 
-/* ================= Comparateur ================= */
-function initCmp(){
-  const opt=VILLES.map((v,i)=>`<option value="${i}">${v.n} — palier ${v.pal}</option>`).join('');
-  $('#selA').innerHTML=opt;$('#selB').innerHTML=opt;
-  $('#selA').value=0;$('#selB').value=1;
-  $('#selA').onchange=$('#selB').onchange=rendCmp;
-  rendCmp();
-}
-function rendCmp(){
-  const a=VILLES[+$('#selA').value], b=VILLES[+$('#selB').value];
-  $('#cmpbars').innerHTML=Object.entries(IND).map(([k,I])=>{
-    const va=val(a,k), vb=val(b,k), m=Math.max(va,vb)||1;
-    return `<div class="cb2">
-      <div class="side a"><div class="bar" style="width:${va/m*100}%;background:var(--vert)"></div><span class="n">${I.fmt(va)}</span></div>
-      <div class="l" style="text-align:center;grid-column:2">${I.lab}</div>
-      <div class="side"><div class="bar" style="width:${vb/m*100}%;background:var(--or)"></div><span class="n">${I.fmt(vb)}</span></div>
-    </div>`;
-  }).join('').replace(/grid-template-columns/g,'');
-  // en-tête
-  $('#cmpbars').insertAdjacentHTML('afterbegin',
-    `<div class="cb2" style="border-bottom:1px solid var(--line);padding-bottom:8px">
-      <div class="l" style="text-align:right;font-weight:600;color:var(--vert)">${a.n}</div>
-      <div class="l" style="text-align:center">année ${annee}</div>
-      <div class="l" style="font-weight:600;color:var(--or)">${b.n}</div></div>`);
-}
+const secs=[...document.querySelectorAll('section[id]')],liens=[...document.querySelectorAll('nav a')];
+addEventListener('scroll',()=>{
+  const y=scrollY+140;let a=null;
+  secs.forEach(s=>{if(s.offsetTop<=y)a=s.id});
+  liens.forEach(l=>l.classList.toggle('on',l.getAttribute('href')==='#'+a));
+},{passive:true});
 
-/* ================= Catalogue ================= */
-function rendCat(){
-  $('#catalogue').innerHTML=JEUX.map(j=>`
-   <div class="ds">
-     <h4>${j.t}</h4>
-     <div class="dd">${j.d}</div>
-     <div class="dt">${j.tags.map(t=>`<span class="tg ${t==='public'?'pub':t==='restreint'?'res':t==='commercialisable'?'com':''}">${t}</span>`).join('')}</div>
-     <button class="dl" style="align-self:flex-start" onclick="telecharger('${j.cle}')">
-       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>
-       ${j.cls==='pub'?'Télécharger':'Demander l\'accès'}</button>
-   </div>`).join('');
-  $('#methodes').innerHTML=Object.entries(IND).map(([k,I])=>`
-   <div style="border:1px solid var(--line);border-radius:4px;padding:12px 14px">
-     <div style="display:flex;gap:9px;align-items:baseline;flex-wrap:wrap">
-       <b style="font-family:var(--disp);font-size:13.5px">${I.lab}</b>
-       <span class="tg">${I.unite}</span><span class="tg">maille : ${I.maille}</span><span class="tg">produit en ${I.prod}</span>
-     </div>
-     <div style="font-size:12.5px;color:var(--mute);margin-top:7px;line-height:1.5">${I.meth}</div>
-   </div>`).join('');
-}
-
-/* ================= Téléchargement réel ================= */
-function csv(rows){return rows.map(r=>r.map(c=>{
-  const s=String(c);return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(';')).join('\n');}
-function fichier(nom,txt){
-  const b=new Blob(["\uFEFF"+txt],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nom;a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
-}
-function telecharger(quoi){
-  if(quoi==='ville'){
-    const r=[["ville","code_territoire","palier","indicateur","annee","valeur","unite","source","produit_en"]];
-    Object.entries(IND).forEach(([k,I])=>ANNEES.forEach((a,i)=>
-      r.push([sel.n,sel.code,sel.pal,I.lab,a,sel.s[k][i],I.unite,I.src,I.prod])));
-    fichier(`ontubf_${sel.code}_indicateurs.csv`,csv(r));
-  }else if(quoi==='reseau'){
-    const r=[["ligne","type","ordre_arret","latitude","longitude","stabilite_arret"]];
-    LIGNES.forEach(l=>l.pts.forEach((p,i)=>r.push([l.n,l.t==='conventionne'?"conventionne":"artisanal",i+1,p[0],p[1],l.t==='conventionne'?"confirmee":"moyenne"])));
-    fichier('ontubf_reseau_ouagadougou.csv',csv(r));
-  }else if(quoi==='accidents'){
-    const r=[["ville","code_territoire","annee","accidents_corporels","source","seuil_minimal"]];
-    VILLES.forEach(v=>ANNEES.forEach((a,i)=>r.push([v.n,v.code,a,v.s.acc[i],"ONASER",3])));
-    fichier('ontubf_accidents.csv',csv(r));
-  }else if(quoi==='comptage'){
-    const r=[["point","latitude","longitude","pas_de_temps","vehicules_moyens"]];
-    COMPTAGE.forEach(([la,lo,n],i)=>r.push([n,la,lo,"15 min",320+i*47]));
-    fichier('ontubf_points_comptage.csv',csv(r));
-  }else if(quoi==='frequentation'||quoi==='od'){
-    alert("Jeu à accès restreint.\n\nDans la plateforme réelle, ce bouton ouvre une demande d'accès : motif d'usage, durée, et périmètre. L'accès accordé porte une date d'expiration obligatoire.");
-  }else{
-    const r=[["ville","code_territoire","region","palier",...Object.values(IND).map(I=>I.lab)]];
-    VILLES.forEach(v=>r.push([v.n,v.code,v.r,v.pal,...Object.keys(IND).map(k=>val(v,k))]));
-    r.push([]);r.push(["Année de référence",annee]);
-    r.push(["Avertissement","Valeurs simulées — maquette de démonstration du Livrable 3"]);
-    fichier(`ontubf_indicateurs_${annee}.csv`,csv(r));
-  }
-}
-
-/* ================= Navigation ================= */
-const TITRES={
- synthese:["Synthèse nationale","Indicateurs de mobilité des dix-sept chefs-lieux de région. Chaque valeur porte sa source, sa date de production et sa maille."],
- reseau:["Réseau de transport","Le référentiel des lignes et des arrêts, publié dans un format d'échange standard réutilisable sans convention."],
- compare:["Comparer deux villes","La comparaison n'est valable qu'entre villes relevant du même mode de collecte."],
- donnees:["Données ouvertes","Chaque jeu est téléchargeable immédiatement, dans un format ouvert, avec sa classification."],
- qualite:["Fraîcheur et méthode","Ce que chaque indicateur mesure exactement, et les limites connues de sa production."],
+/* ═════════ espace authentifié ═════════ */
+const PROFILS={
+ decideur:{nom:"KORSAGA Jean Michel",role:"Décideur · accès national",onglets:["Synthèse nationale","Comparaison des villes","Alertes"]},
+ exploitant:{nom:"OUÉDRAOGO Salif",role:"Exploitant · salle de contrôle",onglets:["État des flux","Alertes ouvertes","Équipements"]},
+ analyste:{nom:"SAWADOGO Aminata",role:"Analyste · accès national",onglets:["Catalogue d'indicateurs","Exploration","Exports"]},
+ producteur:{nom:"SOTRACO — service exploitation",role:"Producteur de données",onglets:["Mes transmissions","Anomalies à corriger","Ce que mes données alimentent"]},
+ collectivite:{nom:"Commune de Bobo-Dioulasso",role:"Collectivité · périmètre communal",onglets:["Mon territoire","Signaler","Contribuer au référentiel"]},
+ admin:{nom:"NIKIEMA Boureima",role:"Administrateur technique",onglets:["Comptes et habilitations","Classification des jeux","Journal d'accès"]}
 };
-$$('.nv').forEach(b=>b.onclick=()=>{
-  $$('.nv').forEach(x=>x.classList.remove('on'));b.classList.add('on');
-  const v=b.dataset.view;
-  $$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
-  $('#vtitle').textContent=TITRES[v][0];$('#vsub').textContent=TITRES[v][1];
-  if(v==='reseau'){initMap2();setTimeout(()=>map2&&map2.invalidateSize(),150);}
-  if(v==='synthese'&&ok)setTimeout(()=>map.invalidateSize(),150);
+
+const V={};
+
+V.decideur=[`
+<div class="atitre">Synthèse nationale</div>
+<p class="asous">Vue de lecture. Les valeurs présentées sont validées et publiées ; les valeurs en cours de contrôle n'y figurent pas.</p>
+<div class="grille4">
+ <div class="kpi ok"><div class="k">Déplacements par jour</div><div class="v">6,97 M</div><div class="d">17 villes, juin 2026</div></div>
+ <div class="kpi ok"><div class="k">Vitesse commerciale</div><div class="v">19,4</div><div class="d">km/h, en hausse de 0,8 sur un an</div></div>
+ <div class="kpi alerte"><div class="k">Accidents corporels</div><div class="v">2 218</div><div class="d">cumul annuel, en hausse de 8 %</div></div>
+ <div class="kpi attente"><div class="k">Couverture du référentiel</div><div class="v">25 %</div><div class="d">du réseau décrit</div></div>
+</div>
+<div class="bloc"><h4>Ce qui a changé depuis votre dernière consultation</h4>
+<div class="n">14 jours</div>
+<table class="tb"><tbody>
+<tr><td style="width:120px">2 sept.</td><td>La vitesse commerciale a été recalculée sur trois ans après révision de la méthode</td><td style="width:110px"><span class="et o">série révisée</span></td></tr>
+<tr><td>28 août</td><td>Ouverture du point de comptage 03, avenue de la Liberté</td><td><span class="et v">nouveau flux</span></td></tr>
+<tr><td>21 août</td><td>Les relevés de stationnement de Bobo-Dioulasso sont publiés</td><td><span class="et v">publié</span></td></tr>
+<tr><td>18 août</td><td>Le flux d'accidentologie n'a rien transmis depuis 34 jours</td><td><span class="et r">interrompu</span></td></tr>
+</tbody></table></div>`,
+`<div class="atitre">Comparaison des villes</div>
+<p class="asous">Les villes ne sont comparables que sur les indicateurs disposant de la même maille et de la même période. Les écarts de couverture sont signalés.</p>
+<div class="bloc"><h4>Vitesse commerciale et accidentologie</h4><div class="n">Août 2026</div>
+<table class="tb"><thead><tr><th>Ville</th><th>Vitesse</th><th>Accidents</th><th>Réseau décrit</th><th>Comparabilité</th></tr></thead><tbody>
+<tr><td>Ouagadougou</td><td>19,4 km/h</td><td>988</td><td>38 %</td><td><span class="et v">complète</span></td></tr>
+<tr><td>Bobo-Dioulasso</td><td>17,2 km/h</td><td>564</td><td>29 %</td><td><span class="et v">complète</span></td></tr>
+<tr><td>Koudougou</td><td>22,6 km/h</td><td>238</td><td>21 %</td><td><span class="et v">complète</span></td></tr>
+<tr><td>Ouahigouya</td><td>—</td><td>188</td><td>6 %</td><td><span class="et o">partielle</span></td></tr>
+<tr><td>Kaya</td><td>—</td><td>146</td><td>4 %</td><td><span class="et o">partielle</span></td></tr>
+<tr><td>Douze autres villes</td><td>—</td><td>94</td><td>0 %</td><td><span class="et g">hors palier 1</span></td></tr>
+</tbody></table></div>`,
+`<div class="atitre">Alertes</div>
+<p class="asous">Seules les alertes de niveau élevé remontent à ce profil. Le traitement de premier niveau relève de l'exploitant.</p>
+<div class="bloc"><h4>Alertes ouvertes</h4><div class="n">2 alertes, aucune critique</div>
+<table class="tb"><tbody>
+<tr><td style="width:96px"><span class="et r">alerte</span></td><td><b>Flux d'accidentologie interrompu depuis 34 jours</b><br><span style="color:#5C6660">Trois indicateurs du noyau prioritaire ne pourront pas être publiés à l'échéance de septembre.</span></td><td style="width:150px">Escaladé à la tutelle</td></tr>
+<tr><td><span class="et o">attention</span></td><td><b>Aucun local identifié pour la salle de contrôle</b><br><span style="color:#5C6660">Jalon bloquant pour la commande des équipements d'affichage.</span></td><td>En attente d'arbitrage</td></tr>
+</tbody></table></div>`];
+
+V.exploitant=[`
+<div class="atitre">État des flux</div>
+<p class="asous">Onze flux déclarés. Le statut indique la dernière réception effective, non l'existence d'une convention.</p>
+<div class="grille4">
+ <div class="kpi ok"><div class="k">Flux reçus ce jour</div><div class="v">7</div><div class="d">sur 8 attendus</div></div>
+ <div class="kpi attente"><div class="k">Lots en quarantaine</div><div class="v">3</div><div class="d">à traiter sous 48 h</div></div>
+ <div class="kpi alerte"><div class="k">Producteurs silencieux</div><div class="v">1</div><div class="d">au-delà de sa périodicité</div></div>
+ <div class="kpi ok"><div class="k">Équipements en ligne</div><div class="v">46 / 48</div><div class="d">deux en maintenance</div></div>
+</div>
+<div class="bloc"><h4>Réceptions des dernières 24 heures</h4><div class="n">Heure de réception, volume et résultat du contrôle</div>
+<table class="tb"><thead><tr><th>Heure</th><th>Producteur</th><th>Jeu de données</th><th>Volume</th><th>Contrôle</th></tr></thead><tbody>
+<tr><td>00:04</td><td>SOTRACO</td><td>Positions de flotte</td><td>1,4 M lignes</td><td><span class="et v">accepté</span></td></tr>
+<tr><td>00:12</td><td>Équipements de comptage</td><td>Comptages horodatés</td><td>4 608 messages</td><td><span class="et v">accepté</span></td></tr>
+<tr><td>02:30</td><td>Police municipale</td><td>Infractions de stationnement</td><td>318 lignes</td><td><span class="et o">quarantaine</span></td></tr>
+<tr><td>06:00</td><td>CCVA</td><td>Visites techniques</td><td>2 044 lignes</td><td><span class="et v">accepté</span></td></tr>
+<tr><td>—</td><td>ONASER</td><td>Accidents de la circulation</td><td>—</td><td><span class="et r">non reçu</span></td></tr>
+</tbody></table></div>`,
+`<div class="atitre">Alertes ouvertes</div>
+<p class="asous">Quatre niveaux : information, attention, alerte, critique. Chaque niveau a son destinataire et son délai.</p>
+<div class="bloc"><h4>À traiter</h4><div class="n">5 alertes</div>
+<table class="tb"><thead><tr><th>Niveau</th><th>Objet</th><th>Ouverte depuis</th><th>Délai</th><th></th></tr></thead><tbody>
+<tr><td><span class="et r">alerte</span></td><td>Flux ONASER interrompu depuis 34 jours</td><td>34 j</td><td>dépassé</td><td><button class="act s">Relancer</button></td></tr>
+<tr><td><span class="et o">attention</span></td><td>Lot Police municipale rejeté : trois champs obligatoires absents</td><td>6 h</td><td>2 j ouvrés</td><td><button class="act s">Voir le motif</button></td></tr>
+<tr><td><span class="et o">attention</span></td><td>Baisse de classification correcte sur la catégorie tricycle, point 01</td><td>2 j</td><td>2 j ouvrés</td><td><button class="act s">Examiner</button></td></tr>
+<tr><td><span class="et g">information</span></td><td>Équipement 12 hors ligne, avenue Kwame N'Krumah</td><td>9 h</td><td>1 j ouvré</td><td><button class="act s">Maintenance</button></td></tr>
+<tr><td><span class="et g">information</span></td><td>Charge inhabituelle au carrefour de l'Université, 7 h 15</td><td>3 h</td><td>1 j ouvré</td><td><button class="act s">Consigner</button></td></tr>
+</tbody></table></div>`,
+`<div class="atitre">Équipements</div>
+<p class="asous">Un équipement connecté n'est pas nécessairement un équipement qui produit correctement. Les deux états sont suivis séparément.</p>
+<div class="bloc"><h4>Points de comptage</h4><div class="n">48 équipements installés, trois villes</div>
+<table class="tb"><thead><tr><th>Point</th><th>Emplacement</th><th>Dernière transmission</th><th>Classification correcte</th><th>État</th></tr></thead><tbody>
+<tr><td>PC-01</td><td>Carrefour de l'Université, Ouagadougou</td><td>il y a 12 min</td><td>94 %</td><td><span class="et v">en service</span></td></tr>
+<tr><td>PC-02</td><td>Avenue Kwame N'Krumah, Ouagadougou</td><td>il y a 9 h</td><td>91 %</td><td><span class="et r">hors ligne</span></td></tr>
+<tr><td>PC-03</td><td>Avenue de la Liberté, Ouagadougou</td><td>il y a 14 min</td><td>88 %</td><td><span class="et o">à surveiller</span></td></tr>
+<tr><td>PC-04</td><td>Rond-point du Paysan, Bobo-Dioulasso</td><td>il y a 11 min</td><td>93 %</td><td><span class="et v">en service</span></td></tr>
+<tr><td>PC-05</td><td>Route de Banfora, Bobo-Dioulasso</td><td>il y a 13 min</td><td>76 %</td><td><span class="et o">dérive détectée</span></td></tr>
+</tbody></table></div>`];
+
+V.analyste=[`
+<div class="atitre">Catalogue d'indicateurs</div>
+<p class="asous">140 indicateurs au portefeuille national, dont 24 au noyau prioritaire. Le niveau de calculabilité qualifie la chaîne méthodologique, non la disponibilité des données.</p>
+<div class="grille4">
+ <div class="kpi"><div class="k">Portefeuille</div><div class="v">140</div><div class="d">indicateurs enregistrés</div></div>
+ <div class="kpi ok"><div class="k">Noyau prioritaire</div><div class="v">24</div><div class="d">16 de niveau 1, 8 de niveau 2</div></div>
+ <div class="kpi attente"><div class="k">Chaîne établie</div><div class="v">44</div><div class="d">faisabilité méthodologique</div></div>
+ <div class="kpi"><div class="k">Produits en régulier</div><div class="v">0</div><div class="d">aucun au stade actuel</div></div>
+</div>
+<div class="bloc"><h4>Noyau prioritaire, extrait</h4><div class="n">Code, domaine, calculabilité, jeu de données principal</div>
+<table class="tb"><thead><tr><th>Code</th><th>Indicateur</th><th>Domaine</th><th>Calculabilité</th><th>Source principale</th></tr></thead><tbody>
+<tr><td>CIRC 001</td><td>Temps de parcours par corridor et tranche horaire</td><td>Circulation</td><td><span class="et v">chaîne établie</span></td><td>Opérateurs privés</td></tr>
+<tr><td>TPUB 025</td><td>Vitesse commerciale par ligne et tranche horaire</td><td>Transport public</td><td><span class="et v">chaîne établie</span></td><td>Traces de flotte</td></tr>
+<tr><td>SECU 001</td><td>Accidents corporels par ville et par an</td><td>Sécurité routière</td><td><span class="et v">chaîne établie</span></td><td>ONASER</td></tr>
+<tr><td>ACCES 001</td><td>Population à moins de 500 m d'un arrêt</td><td>Accessibilité</td><td><span class="et o">à consolider</span></td><td>Référentiel arrêts</td></tr>
+<tr><td>SOCIO 003</td><td>Parts modales des déplacements</td><td>Socio-économie</td><td><span class="et v">chaîne établie</span></td><td>Enquête ménages</td></tr>
+<tr><td>ENV 008</td><td>Émissions estimées du secteur</td><td>Transversal</td><td><span class="et o">à consolider</span></td><td>Sources sectorielles</td></tr>
+</tbody></table></div>`,
+`<div class="atitre">Exploration</div>
+<p class="asous">Accès en lecture au schéma d'analyse. Les données détaillées ne sont pas accessibles depuis ce profil ; les agrégats le sont.</p>
+<div class="grille2">
+ <div class="bloc" style="margin-top:0"><h4>Vitesse commerciale par ligne</h4><div class="n">Ouagadougou, août 2026, heure de pointe du matin</div>
+  <svg class="mini" viewBox="0 0 640 220" role="img" aria-label="Vitesse par ligne">
+   <g stroke="#E8E1D6"><line x1="120" y1="20" x2="620" y2="20"/><line x1="120" y1="60" x2="620" y2="60"/><line x1="120" y1="100" x2="620" y2="100"/><line x1="120" y1="140" x2="620" y2="140"/><line x1="120" y1="180" x2="620" y2="180"/></g>
+   <g font-size="12.5" fill="#5C6660" font-family="Instrument Sans">
+    <text x="112" y="25" text-anchor="end">Ligne 4</text><text x="112" y="65" text-anchor="end">Ligne 7</text>
+    <text x="112" y="105" text-anchor="end">Ligne 12</text><text x="112" y="145" text-anchor="end">Ligne 15</text>
+    <text x="112" y="185" text-anchor="end">Ligne 21</text></g>
+   <g fill="#1F5641"><rect x="120" y="12" width="386" height="16"/><rect x="120" y="52" width="298" height="16"/>
+    <rect x="120" y="92" width="342" height="16"/><rect x="120" y="132" width="214" height="16"/><rect x="120" y="172" width="404" height="16"/></g>
+   <g font-size="12.5" fill="#131E1A" font-family="Instrument Sans" font-weight="600">
+    <text x="516" y="25">21,4</text><text x="428" y="65">16,8</text><text x="472" y="105">19,1</text><text x="344" y="145">12,2</text><text x="534" y="185">22,3</text></g>
+  </svg></div>
+ <div class="bloc" style="margin-top:0"><h4>Requête</h4><div class="n">Trois paramètres suffisent à extraire une série</div>
+  <div class="champ"><label>Indicateur</label><input value="TPUB 025 — Vitesse commerciale"></div>
+  <div class="champ"><label>Maille</label><input value="Ligne"></div>
+  <div class="champ"><label>Période</label><input value="Septembre 2025 à août 2026"></div>
+  <div style="margin-top:18px;display:flex;gap:10px"><button class="act">Exécuter</button><button class="act s">Enregistrer</button></div>
+  <p style="font-size:13px;color:#8C948F;margin-top:14px">Toute extraction est journalisée avec son auteur et son motif.</p>
+ </div>
+</div>`,
+`<div class="atitre">Exports</div>
+<p class="asous">Les extractions produites depuis ce profil portent la version de méthode en vigueur au moment du calcul.</p>
+<div class="bloc"><h4>Mes extractions</h4><div class="n">Conservées 30 jours</div>
+<table class="tb"><thead><tr><th>Extraction</th><th>Demandée</th><th>Volume</th><th>Version</th><th></th></tr></thead><tbody>
+<tr><td>Vitesse commerciale, 12 mois, toutes lignes</td><td>2 sept. 09:14</td><td>3 240 lignes</td><td>méthode v2</td><td><a class="lien" href="#">Télécharger</a></td></tr>
+<tr><td>Comptages PC-01, quart d'heure, août</td><td>1<sup>er</sup> sept. 16:02</td><td>2 976 lignes</td><td>—</td><td><a class="lien" href="#">Télécharger</a></td></tr>
+<tr><td>Accidents géolocalisés, 2025</td><td>28 août 11:37</td><td>1 964 lignes</td><td>méthode v1</td><td><a class="lien" href="#">Télécharger</a></td></tr>
+</tbody></table></div>`];
+
+V.producteur=[`
+<div class="atitre">Mes transmissions</div>
+<p class="asous">Vous voyez ce que vous transmettez et ce qu'il en advient. Vous ne voyez pas les données des autres producteurs.</p>
+<div class="grille4">
+ <div class="kpi ok"><div class="k">Reçues ce mois</div><div class="v">31 / 31</div><div class="d">aucune transmission manquée</div></div>
+ <div class="kpi ok"><div class="k">Acceptées</div><div class="v">29</div><div class="d">après contrôle automatique</div></div>
+ <div class="kpi attente"><div class="k">En quarantaine</div><div class="v">2</div><div class="d">à corriger de votre côté</div></div>
+ <div class="kpi"><div class="k">Indicateurs alimentés</div><div class="v">6</div><div class="d">dont 4 au noyau prioritaire</div></div>
+</div>
+<div class="bloc"><h4>Dernières remises</h4><div class="n">Chaque remise porte son empreinte et son statut</div>
+<table class="tb"><thead><tr><th>Remise</th><th>Date</th><th>Volume</th><th>Statut</th></tr></thead><tbody>
+<tr><td>Positions de flotte, 1<sup>er</sup> sept.</td><td>2 sept. 00:04</td><td>1,4 M lignes</td><td><span class="et v">intégrée</span></td></tr>
+<tr><td>Positions de flotte, 31 août</td><td>1<sup>er</sup> sept. 00:06</td><td>1,4 M lignes</td><td><span class="et v">intégrée</span></td></tr>
+<tr><td>Validations billettique, août</td><td>1<sup>er</sup> sept. 08:20</td><td>412 880 lignes</td><td><span class="et o">quarantaine</span></td></tr>
+<tr><td>Programme d'exploitation, sept.</td><td>29 août 15:40</td><td>1 partition</td><td><span class="et v">intégrée</span></td></tr>
+</tbody></table></div>`,
+`<div class="atitre">Anomalies à corriger</div>
+<p class="asous">Une anomalie ne bloque pas la suite : le lot est mis de côté et vous êtes informé du motif exact.</p>
+<div class="bloc"><h4>Lot en quarantaine</h4><div class="n">Validations billettique, août 2026</div>
+<table class="tb"><thead><tr><th>Contrôle</th><th>Constat</th><th>Lignes touchées</th><th>Action attendue</th></tr></thead><tbody>
+<tr><td>Champ obligatoire</td><td>La colonne d'identifiant d'arrêt est vide</td><td>3 412</td><td>Renseigner ou déclarer non applicable</td></tr>
+<tr><td>Rattachement</td><td>Douze identifiants d'arrêt ne correspondent à aucun objet du référentiel</td><td>8 906</td><td>Vérifier les codes, ou signaler des arrêts nouveaux</td></tr>
+<tr><td>Cohérence temporelle</td><td>Quatre validations portent un horodatage postérieur à la remise</td><td>4</td><td>Corriger l'horodatage</td></tr>
+</tbody></table>
+<div style="margin-top:18px;display:flex;gap:10px"><button class="act">Déposer un lot corrigé</button><button class="act s">Demander un appui</button></div></div>`,
+`<div class="atitre">Ce que mes données alimentent</div>
+<p class="asous">La contrepartie de la transmission : savoir à quoi elle sert et voir le résultat avant sa publication.</p>
+<div class="bloc"><h4>Indicateurs dépendant de vos jeux</h4><div class="n">Six indicateurs, dont quatre au noyau prioritaire</div>
+<table class="tb"><thead><tr><th>Indicateur</th><th>Votre contribution</th><th>Dernière valeur</th><th>Publication</th></tr></thead><tbody>
+<tr><td>Vitesse commerciale par ligne</td><td>Traces de flotte</td><td>19,4 km/h</td><td><span class="et v">publié</span></td></tr>
+<tr><td>Fréquentation en voyages par jour</td><td>Validations billettique</td><td>—</td><td><span class="et o">en attente du lot corrigé</span></td></tr>
+<tr><td>Amplitude de service moyenne</td><td>Programme d'exploitation</td><td>15 h 40</td><td><span class="et v">publié</span></td></tr>
+<tr><td>Régularité aux arrêts</td><td>Traces de flotte</td><td>—</td><td><span class="et g">palier 2</span></td></tr>
+</tbody></table></div>`];
+
+V.collectivite=[`
+<div class="atitre">Mon territoire</div>
+<p class="asous">Commune de Bobo-Dioulasso. Vous voyez les données de votre périmètre et les indicateurs nationaux publiés.</p>
+<div class="grille4">
+ <div class="kpi ok"><div class="k">Vitesse commerciale</div><div class="v">17,2</div><div class="d">km/h, en baisse de 0,4</div></div>
+ <div class="kpi alerte"><div class="k">Accidents corporels</div><div class="v">564</div><div class="d">cumul annuel</div></div>
+ <div class="kpi attente"><div class="k">Réseau décrit</div><div class="v">29 %</div><div class="d">de la voirie communale</div></div>
+ <div class="kpi ok"><div class="k">Points de comptage</div><div class="v">12</div><div class="d">deux installés ce mois</div></div>
+</div>
+<div class="bloc"><h4>Ce qui manque sur votre territoire</h4><div class="n">Les lacunes sont signalées plutôt que masquées</div>
+<table class="tb"><tbody>
+<tr><td style="width:180px"><span class="et o">à compléter</span></td><td>Le référentiel des arrêts du transport artisanal couvre 4 secteurs sur 25</td><td style="width:170px"><button class="act s">Organiser un relevé</button></td></tr>
+<tr><td><span class="et o">à compléter</span></td><td>Aucun relevé de stationnement au-delà du centre-ville</td><td><button class="act s">Organiser un relevé</button></td></tr>
+<tr><td><span class="et r">absent</span></td><td>Aucune donnée de fréquentation du transport artisanal</td><td><button class="act s">Nous écrire</button></td></tr>
+</tbody></table></div>`,
+`<div class="atitre">Signaler</div>
+<p class="asous">Un signalement ne modifie pas la donnée : il ouvre une vérification. La correction reste soumise au contrôle de l'Observatoire.</p>
+<div class="bloc"><h4>Nouveau signalement</h4><div class="n">Sur un objet du référentiel ou sur une valeur publiée</div>
+<div class="champ"><label>Objet concerné</label><input value="Arrêt — Marché de Bobo, secteur 3"></div>
+<div class="champ"><label>Nature du signalement</label><input value="L'arrêt a été déplacé de 80 mètres après les travaux"></div>
+<div class="champ"><label>Pièce jointe</label><input value="photo-arret-marche.jpg"></div>
+<div style="margin-top:18px"><button class="act">Envoyer le signalement</button></div></div>
+<div class="bloc"><h4>Mes signalements</h4><div class="n">Trois en cours</div>
+<table class="tb"><tbody>
+<tr><td style="width:120px">21 août</td><td>Ligne 3 : itinéraire modifié depuis la fermeture de l'avenue</td><td style="width:140px"><span class="et v">pris en compte</span></td></tr>
+<tr><td>14 août</td><td>Zone de stationnement du marché : capacité erronée</td><td><span class="et o">en vérification</span></td></tr>
+<tr><td>2 août</td><td>Deux arrêts manquants sur la route de Banfora</td><td><span class="et v">intégré</span></td></tr>
+</tbody></table></div>`,
+`<div class="atitre">Contribuer au référentiel</div>
+<p class="asous">Vos agents peuvent relever directement sur le terrain. Leur relevé entre en quarantaine et est validé par l'Observatoire.</p>
+<div class="bloc"><h4>Campagnes ouvertes</h4><div class="n">Deux campagnes vous concernent</div>
+<table class="tb"><thead><tr><th>Campagne</th><th>Objet</th><th>Avancement</th><th></th></tr></thead><tbody>
+<tr><td>Arrêts du transport artisanal</td><td>Relever position, nom d'usage et équipement</td><td>4 secteurs sur 25</td><td><button class="act s">Voir le protocole</button></td></tr>
+<tr><td>Inventaire du stationnement</td><td>Capacité, statut et tarification</td><td>Centre-ville terminé</td><td><button class="act s">Voir le protocole</button></td></tr>
+</tbody></table>
+<p style="font-size:14px;color:#5C6660;margin-top:16px">L'application de collecte fonctionne sans connexion : le référentiel est téléchargé avant la mission et les relevés se synchronisent au retour.</p>
+<div style="margin-top:14px"><a class="act" href="mobile.html" style="display:inline-block">Ouvrir l'application de collecte</a></div></div>`];
+
+V.admin=[`
+<div class="atitre">Comptes et habilitations</div>
+<p class="asous">Une habilitation porte un périmètre et une échéance. Sans échéance, elle serait reconduite tacitement et jamais réexaminée.</p>
+<div class="grille4">
+ <div class="kpi"><div class="k">Comptes actifs</div><div class="v">64</div><div class="d">dont 11 producteurs</div></div>
+ <div class="kpi attente"><div class="k">Habilitations à échéance</div><div class="v">7</div><div class="d">dans les 30 jours</div></div>
+ <div class="kpi alerte"><div class="k">Comptes inactifs</div><div class="v">3</div><div class="d">plus de 90 jours sans connexion</div></div>
+ <div class="kpi ok"><div class="k">Second facteur actif</div><div class="v">100 %</div><div class="d">sur les accès non publics</div></div>
+</div>
+<div class="bloc"><h4>Habilitations arrivant à échéance</h4><div class="n">Le renouvellement est une décision, pas une reconduction</div>
+<table class="tb"><thead><tr><th>Compte</th><th>Profil</th><th>Périmètre</th><th>Échéance</th><th></th></tr></thead><tbody>
+<tr><td>a.sawadogo</td><td>Analyste</td><td>National</td><td>dans 8 jours</td><td><button class="act s">Renouveler</button></td></tr>
+<tr><td>service-technique-bobo</td><td>Collectivité</td><td>Bobo-Dioulasso</td><td>dans 14 jours</td><td><button class="act s">Renouveler</button></td></tr>
+<tr><td>etudiant-2026-014</td><td>Contributeur</td><td>Campagne arrêts</td><td>dans 21 jours</td><td><button class="act s">Renouveler</button></td></tr>
+</tbody></table></div>`,
+`<div class="atitre">Classification des jeux</div>
+<p class="asous">L'administrateur applique les décisions, il ne les prend pas. La classification d'un jeu appartient à la structure qui en est propriétaire.</p>
+<div class="bloc"><h4>Jeux de données et décision de publication</h4><div class="n">La colonne de droite indique qui décide</div>
+<table class="tb"><thead><tr><th>Jeu de données</th><th>Classification</th><th>Propriétaire</th><th>Décision</th></tr></thead><tbody>
+<tr><td>Référentiel du réseau</td><td><span class="et v">public</span></td><td>Observatoire</td><td>Modifiable ici</td></tr>
+<tr><td>Comptages de circulation</td><td><span class="et v">public</span></td><td>Observatoire</td><td>Modifiable ici</td></tr>
+<tr><td>Accidents de la circulation</td><td><span class="et o">restreint</span></td><td>ONASER</td><td>Décision du propriétaire</td></tr>
+<tr><td>Validations billettique</td><td><span class="et r">sensible</span></td><td>SOTRACO</td><td>Décision du propriétaire</td></tr>
+<tr><td>Infractions de stationnement</td><td><span class="et o">restreint</span></td><td>Police municipale</td><td>Décision du propriétaire</td></tr>
+</tbody></table>
+<p style="font-size:14px;color:#5C6660;margin-top:16px">Une demande de reclassement est transmise au propriétaire et consignée. L'Observatoire ne peut pas publier une donnée contre la décision de celui qui la produit.</p></div>`,
+`<div class="atitre">Journal d'accès</div>
+<p class="asous">Journal en écriture seule, recopié vers un collecteur administré par une autre personne. L'administrateur peut le lire, non le modifier.</p>
+<div class="bloc"><h4>Consultations des dernières heures</h4><div class="n">Sur données non publiques</div>
+<table class="tb"><thead><tr><th>Heure</th><th>Compte</th><th>Objet consulté</th><th>Motif déclaré</th></tr></thead><tbody>
+<tr><td>10:42</td><td>a.sawadogo</td><td>Accidents géolocalisés, Ouagadougou</td><td>Note d'analyse points noirs</td></tr>
+<tr><td>09:58</td><td>j.korsaga</td><td>Synthèse nationale</td><td>—</td></tr>
+<tr><td>09:14</td><td>a.sawadogo</td><td>Extraction vitesse commerciale, 12 mois</td><td>Rapport annuel</td></tr>
+<tr><td>08:30</td><td>service-technique-bobo</td><td>Indicateurs Bobo-Dioulasso</td><td>—</td></tr>
+</tbody></table></div>`];
+
+let profilActuel=null;
+function connecter(){document.getElementById('modal').classList.add('on')}
+function fermer(){document.getElementById('modal').classList.remove('on')}
+function ouvrir(p){
+  profilActuel=p; fermer();
+  const P=PROFILS[p];
+  document.getElementById('wnom').textContent=P.nom;
+  document.getElementById('wrole').textContent=P.role;
+  const ong=document.getElementById('onglets'); ong.innerHTML='';
+  P.onglets.forEach((t,i)=>{
+    const b=document.createElement('button');
+    b.textContent=t; if(i===0)b.classList.add('on');
+    b.onclick=()=>{[...ong.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');
+      document.querySelectorAll('#acorps .vue').forEach((v,j)=>v.classList.toggle('on',j===i));
+      window.scrollTo(0,0);};
+    ong.appendChild(b);
+  });
+  document.getElementById('acorps').innerHTML=
+    V[p].map((h,i)=>`<div class="vue${i===0?' on':''}">${h}</div>`).join('');
+  document.getElementById('app').classList.add('on');
+  document.body.style.overflow='hidden';
+  window.scrollTo(0,0);
+  const sel=document.getElementById('profil');
+  if(sel) sel.value=P.role.split(' ·')[0];
+}
+function deconnecter(){
+  document.getElementById('app').classList.remove('on');
+  document.body.style.overflow='';
+  profilActuel=null;
+}
+document.querySelector('.cnx').addEventListener('click',connecter);
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')fermer()});
+addEventListener('keydown',e=>{if(e.key==='Escape'){fermer();}});
+const selp=document.getElementById('profil');
+if(selp) selp.addEventListener('change',()=>{
+  const m={'Vue publique':null,'Décideur':'decideur','Exploitant':'exploitant','Analyste':'analyste',
+           'Producteur':'producteur','Collectivité':'collectivite','Administrateur':'admin'};
+  const k=m[selp.value];
+  if(k) ouvrir(k); else deconnecter();
 });
 
-/* ================= Année ================= */
-$('#range').oninput=e=>{annee=+e.target.value;$('#yr').textContent=annee;rendTout();};
-let timer=null;
-$('#play').onclick=()=>{
-  if(timer){clearInterval(timer);timer=null;$('#play').textContent="▶ Dérouler la série";return;}
-  $('#play').textContent="■ Arrêter";
-  let i=0;
-  timer=setInterval(()=>{
-    annee=ANNEES[i%5];$('#range').value=annee;$('#yr').textContent=annee;rendTout();i++;
-    if(i>10){clearInterval(timer);timer=null;$('#play').textContent="▶ Dérouler la série";}
-  },900);
-};
-$$('thead th').forEach(th=>th.onclick=()=>{
-  const k=th.dataset.s;if(tri===k)sens*=-1;else{tri=k;sens=(k==='name')?1:-1;}rendTable();});
-
-/* ================= Init ================= */
-function rendTout(){rendKPI();rendCarte();rendLeg();rendFiche();rendTable();if($('#v-compare').classList.contains('on'))rendCmp();}
-rendFraicheur();rendOutils();rendRtool();rendCat();initCmp();rendTout();
-window.telecharger=telecharger;
-if(ok)setTimeout(()=>map.invalidateSize(),250);
 </script>
 </body>
 </html>
