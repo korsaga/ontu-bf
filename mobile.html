@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ONTU-BF — Application mobile de collecte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16211E; --gris:#5F6D68; --pale:#93A29B; --trait:#E0E5E2; --fond:#F4F6F5; --blanc:#fff;
+  --anth:#262626; --vert:#3B7A3F; --vertf:#EDF4ED; --or:#97690A; --orf:#FAF3E2;
+  --prune:#5A4A72; --prunef:#F0EDF5; --bleu:#4A6572; --bleuf:#E7EDF0;
+  --disp:'Archivo',system-ui,sans-serif; --corps:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--fond);color:var(--ink);font-family:var(--corps);font-size:15px;line-height:1.5}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+
+.page{max-width:1320px;margin:0 auto;padding:24px 20px 60px}
+header.h{margin-bottom:20px}
+header.h h1{font-family:var(--disp);font-size:21px;font-weight:700;letter-spacing:-.3px}
+header.h p{color:var(--gris);font-size:13px;margin-top:4px;max-width:80ch}
+
+.barre{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:18px 0 22px}
+.barre .lb{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--pale);font-weight:600;margin-right:4px}
+.ch{border:1px solid var(--trait);background:var(--blanc);padding:7px 13px;border-radius:3px;
+  font-size:13px;font-weight:600;color:var(--gris);cursor:pointer}
+.ch:hover{border-color:var(--anth);color:var(--anth)}
+.ch.on{background:var(--anth);border-color:var(--anth);color:#fff}
+
+.scene{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap}
+.tel-bloc{flex:none}
+.tel{width:322px;height:660px;background:var(--anth);border-radius:34px;padding:11px;
+  box-shadow:0 18px 40px -18px rgba(0,0,0,.45)}
+.ecran{width:100%;height:100%;background:var(--blanc);border-radius:25px;overflow:hidden;
+  display:flex;flex-direction:column;position:relative}
+.statut{height:26px;background:var(--blanc);display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;font-size:10px;color:var(--gris);font-family:var(--mono);flex:none}
+.appbar{background:var(--anth);color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;flex:none}
+.appbar .t{font-family:var(--disp);font-size:14px;font-weight:600;flex:1}
+.appbar .ret{font-size:17px;opacity:.8}
+.corps{flex:1;overflow-y:auto;padding:14px}
+.corps::-webkit-scrollbar{width:0}
+.tabs{display:flex;border-top:1px solid var(--trait);flex:none;background:var(--blanc)}
+.tabs div{flex:1;text-align:center;padding:9px 4px;font-size:10px;color:var(--pale);font-weight:600}
+.tabs div.on{color:var(--anth)}
+.tabs .ic{display:block;font-size:16px;margin-bottom:2px;font-weight:400}
+
+.hors{background:var(--orf);border:1px solid #E4D5AB;border-radius:3px;padding:8px 10px;
+  font-size:11.5px;color:#6E4E07;display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.hors b{font-weight:700}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--or);flex:none}
+
+.k{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--pale);font-weight:600;margin:14px 0 6px}
+.k:first-child{margin-top:0}
+.item{border:1px solid var(--trait);border-radius:3px;padding:11px 12px;margin-bottom:8px;background:var(--blanc)}
+.item .n{font-size:13.5px;font-weight:600}
+.item .d{font-size:11.5px;color:var(--gris);margin-top:3px}
+.item.act{border-color:var(--vert);background:var(--vertf)}
+.item.att{border-color:var(--or);background:var(--orf)}
+.item .r{float:right;font-family:var(--mono);font-size:10.5px;color:var(--pale)}
+
+.gros{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:4px}
+.gros button{border:1px solid var(--trait);background:var(--blanc);border-radius:3px;padding:15px 8px;
+  text-align:center;cursor:pointer}
+.gros button .ic{font-size:21px;display:block;margin-bottom:5px}
+.gros button .t{font-size:12px;font-weight:600}
+.gros button:hover{border-color:var(--anth)}
+
+label.f{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--pale);
+  font-weight:600;margin:12px 0 5px}
+label.f .ob{color:var(--or)}
+.ci{width:100%;padding:9px 10px;border:1px solid var(--trait);border-radius:3px;background:var(--blanc);font-size:13px}
+.seg{display:flex;gap:5px}
+.seg button{flex:1;padding:8px 4px;border:1px solid var(--trait);background:var(--blanc);border-radius:3px;
+  font-size:11.5px;font-weight:600;color:var(--gris);cursor:pointer}
+.seg button.on{background:var(--anth);border-color:var(--anth);color:#fff}
+.gps{background:var(--vertf);border:1px solid #C2D8C4;border-radius:3px;padding:10px;margin-top:6px}
+.gps .c{font-family:var(--mono);font-size:12px;color:#2C5A2F;font-weight:500}
+.gps .p{font-size:11px;color:var(--gris);margin-top:2px}
+.valider{width:100%;margin-top:16px;padding:12px;background:var(--anth);color:#fff;border:none;
+  border-radius:3px;font-weight:600;font-size:14px;cursor:pointer}
+.second{width:100%;margin-top:8px;padding:10px;background:var(--blanc);color:var(--gris);
+  border:1px solid var(--trait);border-radius:3px;font-weight:600;font-size:13px;cursor:pointer}
+.avert{background:var(--prunef);border:1px solid #C7BEDA;border-radius:3px;padding:9px 11px;
+  font-size:11.5px;color:#453A57;margin-top:12px}
+.file .l{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--trait)}
+.file .l:last-child{border-bottom:none}
+.file .st{width:8px;height:8px;border-radius:50%;flex:none}
+.file .n{flex:1;font-size:12.5px}
+.file .h{font-family:var(--mono);font-size:10.5px;color:var(--pale)}
+.total{background:var(--fond);border-radius:3px;padding:10px 12px;margin-bottom:12px;
+  display:flex;justify-content:space-between;font-size:12.5px}
+.total b{font-family:var(--disp);font-size:17px}
+
+.notes{flex:1;min-width:300px}
+.notes h2{font-family:var(--disp);font-size:15px;font-weight:600;margin-bottom:4px}
+.notes .s{color:var(--gris);font-size:12.5px;margin-bottom:16px}
+.carte{background:var(--blanc);border:1px solid var(--trait);border-radius:4px;padding:15px 16px;margin-bottom:12px}
+.carte h3{font-family:var(--disp);font-size:13.5px;font-weight:600;margin-bottom:7px}
+.carte p{font-size:12.5px;color:var(--gris);line-height:1.55}
+.carte ul{margin:6px 0 0 16px;font-size:12.5px;color:var(--gris)}
+.carte li{margin-bottom:4px}
+.tg{display:inline-block;font-family:var(--mono);font-size:9.5px;padding:2px 6px;border-radius:2px;
+  background:var(--fond);border:1px solid var(--trait);color:var(--gris);margin-right:5px}
+footer.p{border-top:1px solid var(--trait);margin-top:30px;padding-top:16px;font-size:11.5px;color:var(--pale)}
+@media(max-width:760px){.scene{flex-direction:column}.tel{width:100%;max-width:340px}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="h">
+  <h1>ONTU-BF — Application mobile de collecte</h1>
+  <p>Maquette de démonstration du Livrable 3. L'application fonctionne intégralement hors connexion : le relevé se fait sans réseau, la transmission attend le retour de la couverture.</p>
+</header>
+
+<div class="barre">
+  <span class="lb">Profil</span>
+  <button class="ch on" data-p="inst">Agent institutionnel</button>
+  <button class="ch" data-p="temp">Collecteur temporaire</button>
+  <button class="ch" data-p="vol">Contributeur volontaire</button>
+  <span class="lb" style="margin-left:14px">Écran</span>
+  <button class="ch on" data-e="accueil">Accueil</button>
+  <button class="ch" data-e="choix">Type de relevé</button>
+  <button class="ch" data-e="arret">Relevé d'arrêt</button>
+  <button class="ch" data-e="stat">Stationnement</button>
+  <button class="ch" data-e="file">File d'envoi</button>
+</div>
+
+<div class="scene">
+  <div class="tel-bloc">
+    <div class="tel"><div class="ecran">
+      <div class="statut"><span id="heure">08:42</span><span id="reseau">hors connexion</span></div>
+      <div class="appbar"><span class="ret" id="ret"></span><span class="t" id="titre">Collecte</span><span id="pastille" style="font-size:10px;opacity:.75"></span></div>
+      <div class="corps" id="corps"></div>
+      <div class="tabs" id="tabs"></div>
+    </div></div>
+  </div>
+
+  <div class="notes" id="notes"></div>
+</div>
+
+<footer class="p">
+  ONTU-BF · Maquette de démonstration du Livrable 3 — toutes les valeurs sont simulées ·
+  PMDUVS · Groupement IDIAWARE SARL / Data Transport
+</footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let profil="inst", ecran="accueil";
+
+const PROFILS={
+ inst:{n:"Agent institutionnel",terminal:"terminal fourni par l'Observatoire",
+   validation:"Le relevé entre directement après contrôle automatique.",
+   habilitation:"permanente", couleur:"var(--vert)"},
+ temp:{n:"Collecteur temporaire",terminal:"application sur appareil personnel",
+   validation:"Le relevé entre après contrôle automatique. L'habilitation expire à la fin de la mission.",
+   habilitation:"expire le 31 octobre", couleur:"var(--bleu)"},
+ vol:{n:"Contributeur volontaire",terminal:"application sur appareil personnel",
+   validation:"Le relevé est mis en attente et repris par un agent de l'Observatoire avant intégration.",
+   habilitation:"aucune habilitation permanente", couleur:"var(--or)"}
+};
+
+const ECRANS={
+ accueil:{titre:"Collecte", ret:"", tab:0, corps:()=>{
+  const P=PROFILS[profil];
+  const missions = profil==="vol"
+    ? `<div class="k">Contribuer</div>
+       <div class="item"><div class="n">Signaler un arrêt</div><div class="d">Votre relevé sera vérifié par un agent avant d'être intégré</div></div>
+       <div class="item"><div class="n">Corriger une information</div><div class="d">Nom, position, fréquence observée</div></div>`
+    : `<div class="k">Mes missions du jour</div>
+       <div class="item act"><span class="r">en cours</span><div class="n">Secteur 4 — arrêts</div><div class="d">12 relevés sur 18 · Ouagadougou</div></div>
+       <div class="item"><span class="r">à faire</span><div class="n">Aire de stationnement — gare routière</div><div class="d">relevé d'occupation, plage 08 h – 09 h</div></div>
+       <div class="item"><span class="r">à faire</span><div class="n">Itinéraire artisanal A</div><div class="d">aller-retour, marquage des arrêts</div></div>`;
+  return `
+   <div class="hors"><span class="dot"></span><span><b>Hors connexion.</b> 7 relevés en attente d'envoi.</span></div>
+   <div class="total"><span>Référentiel embarqué</span><b>1 284 objets</b></div>
+   ${missions}
+   <div class="k">Raccourcis</div>
+   <div class="gros">
+     <button onclick="aller('choix')"><span class="ic">＋</span><span class="t">Nouveau relevé</span></button>
+     <button onclick="aller('file')"><span class="ic">↑</span><span class="t">File d'envoi</span></button>
+   </div>`;
+ }},
+
+ choix:{titre:"Nouveau relevé", ret:"‹", tab:1, corps:()=>`
+   <div class="hors"><span class="dot"></span><span><b>Hors connexion.</b> Le relevé sera transmis au retour du réseau.</span></div>
+   <div class="k">Que relevez-vous ?</div>
+   <div class="gros">
+     <button onclick="aller('arret')"><span class="ic">⬤</span><span class="t">Point d'arrêt</span></button>
+     <button onclick="aller('arret')"><span class="ic">▬</span><span class="t">Itinéraire</span></button>
+     <button onclick="aller('stat')"><span class="ic">▦</span><span class="t">Stationnement</span></button>
+     <button onclick="aller('arret')"><span class="ic">◆</span><span class="t">Équipement</span></button>
+   </div>
+   <div class="avert">Chaque relevé se rattache à un objet du référentiel embarqué. Si l'objet n'existe pas, sa création est soumise à validation.</div>`
+ },
+
+ arret:{titre:"Point d'arrêt", ret:"‹", tab:1, corps:()=>{
+  const P=PROFILS[profil];
+  return `
+   <div class="hors"><span class="dot"></span><span><b>Hors connexion.</b> Enregistrement local.</span></div>
+
+   <label class="f">Rattachement <span class="ob">obligatoire</span></label>
+   <select class="ci">
+     <option>Rond-point des Nations unies — S0001842</option>
+     <option>Avenue Kwame N'Krumah — S0001855</option>
+     <option>— créer un objet nouveau —</option>
+   </select>
+
+   <label class="f">Position <span class="ob">obligatoire</span></label>
+   <div class="gps">
+     <div class="c">12.37214 · −1.51836</div>
+     <div class="p">précision 4 m · relevé il y a 3 s</div>
+   </div>
+
+   <label class="f">Type d'objet <span class="ob">obligatoire</span></label>
+   <div class="seg">
+     <button class="on">Arrêt</button><button>Tronçon</button><button>Zone</button>
+   </div>
+
+   <label class="f">Stabilité <span class="ob">obligatoire</span></label>
+   <div class="seg">
+     <button class="on">Permanent</button><button>Habituel</button><button>Occasionnel</button>
+   </div>
+
+   <label class="f">Libellé <span style="color:var(--pale)">facultatif</span></label>
+   <input class="ci" placeholder="laisser vide si l'arrêt n'a pas de nom">
+
+   <label class="f">Photo <span style="color:var(--pale)">facultatif</span></label>
+   <button class="second">Prendre une photo</button>
+
+   <button class="valider" onclick="aller('file')">Enregistrer le relevé</button>
+   <div class="avert">${P.validation}</div>`;
+ }},
+
+ stat:{titre:"Stationnement", ret:"‹", tab:1, corps:()=>`
+   <div class="hors"><span class="dot"></span><span><b>Hors connexion.</b> Enregistrement local.</span></div>
+
+   <label class="f">Secteur témoin <span class="ob">obligatoire</span></label>
+   <select class="ci">
+     <option>Gare routière — secteur 33</option>
+     <option>Lafiabougou — aire nord</option>
+     <option>Centre-ville — avenue de la Liberté</option>
+   </select>
+
+   <label class="f">Plage horaire <span class="ob">obligatoire</span></label>
+   <div class="seg">
+     <button class="on">08 h – 09 h</button><button>12 h – 13 h</button><button>17 h – 18 h</button>
+   </div>
+
+   <label class="f">Places recensées <span class="ob">obligatoire</span></label>
+   <input class="ci" value="48">
+
+   <label class="f">Places occupées <span class="ob">obligatoire</span></label>
+   <input class="ci" value="41">
+
+   <label class="f">Dont deux-roues</label>
+   <input class="ci" value="17">
+
+   <div class="total" style="margin-top:14px"><span>Taux d'occupation</span><b>85 %</b></div>
+
+   <button class="valider" onclick="aller('file')">Enregistrer le relevé</button>
+   <div class="avert">Le protocole impose le même secteur et la même plage horaire d'une campagne à l'autre. Sans quoi les taux ne sont pas comparables.</div>`
+ },
+
+ file:{titre:"File d'envoi", ret:"‹", tab:2, corps:()=>`
+   <div class="hors"><span class="dot"></span><span><b>Hors connexion.</b> L'envoi reprendra automatiquement.</span></div>
+   <div class="total"><span>En attente d'envoi</span><b>7</b></div>
+   <div class="file">
+     <div class="l"><span class="st" style="background:var(--or)"></span><span class="n">Arrêt — Rond-point des Nations unies</span><span class="h">08:42</span></div>
+     <div class="l"><span class="st" style="background:var(--or)"></span><span class="n">Stationnement — gare routière</span><span class="h">08:31</span></div>
+     <div class="l"><span class="st" style="background:var(--or)"></span><span class="n">Arrêt — nouveau, sans nom</span><span class="h">08:19</span></div>
+     <div class="l"><span class="st" style="background:var(--or)"></span><span class="n">Itinéraire A — trace aller</span><span class="h">07:58</span></div>
+     <div class="l"><span class="st" style="background:var(--vert)"></span><span class="n">Arrêt — Avenue Kwame N'Krumah</span><span class="h">hier</span></div>
+     <div class="l"><span class="st" style="background:var(--vert)"></span><span class="n">Équipement — feu tricolore</span><span class="h">hier</span></div>
+   </div>
+   <button class="second" onclick="simulerEnvoi()">Forcer une tentative d'envoi</button>
+   <div class="avert">Aucun relevé n'est perdu. Tant que la file n'est pas vide, l'application le signale à chaque ouverture.</div>`
+ }
+};
+
+const TABS=[["⌂","Accueil"],["＋","Relevé"],["↑","File"],["☰","Référentiel"]];
+
+function aller(e){ ecran=e; rendre(); }
+function setProfil(p){ profil=p; rendre(); }
+function simulerEnvoi(){
+  $("#reseau").textContent="recherche du réseau…";
+  setTimeout(()=>{ $("#reseau").textContent="hors connexion"; }, 1600);
+}
+
+function rendre(){
+  const E=ECRANS[ecran], P=PROFILS[profil];
+  $("#titre").textContent=E.titre;
+  $("#ret").textContent=E.ret;
+  $("#ret").style.cursor=E.ret?"pointer":"default";
+  $("#ret").onclick=E.ret?()=>aller("accueil"):null;
+  $("#pastille").textContent=profil==="inst"?"AI":profil==="temp"?"CT":"CV";
+  $("#corps").innerHTML=E.corps();
+  $("#corps").scrollTop=0;
+  $("#tabs").innerHTML=TABS.map((t,i)=>
+    `<div class="${i===E.tab?'on':''}"><span class="ic">${t[0]}</span>${t[1]}</div>`).join("");
+  $$(".ch[data-p]").forEach(b=>b.classList.toggle("on",b.dataset.p===profil));
+  $$(".ch[data-e]").forEach(b=>b.classList.toggle("on",b.dataset.e===ecran));
+  rendreNotes();
+}
+
+function rendreNotes(){
+  const P=PROFILS[profil];
+  const N={
+   accueil:["L'écran d'accueil","L'état de la connexion et le nombre de relevés en attente sont affichés en permanence. C'est la première exigence : l'agent doit savoir si son travail est parti.",
+     ["Le référentiel embarqué est téléchargé avant la sortie",
+      "Les missions sont assignées pour les agents et les collecteurs temporaires",
+      "Le contributeur volontaire n'a pas de mission : il signale ce qu'il observe"]],
+   choix:["Le choix du type de relevé","Quatre formulaires distincts, chacun avec ses champs obligatoires propres. Un formulaire unique produirait des relevés incomparables.",
+     ["Point d'arrêt, itinéraire, stationnement, équipement",
+      "Chaque relevé se rattache obligatoirement à un objet du référentiel",
+      "La création d'un objet nouveau est possible, mais soumise à validation"]],
+   arret:["Le relevé d'un point d'arrêt","Le rattachement et la position sont obligatoires. Le libellé ne l'est pas : l'imposer bloquerait un relevé sur un arrêt sans nom, ce qui est le cas courant du transport artisanal.",
+     ["La stabilité conditionne le seuil de déplacement : 50 m pour permanent et habituel, 100 m pour occasionnel",
+      "La position est capturée automatiquement, avec sa précision",
+      "Aucune saisie libre du nom d'arrêt : on choisit dans le référentiel ou on crée"]],
+   stat:["Le relevé de stationnement","Le protocole impose le même secteur témoin et la même plage horaire d'une campagne à l'autre. C'est ce qui rend les taux comparables dans le temps.",
+     ["Les secteurs témoins sont définis une fois et documentés",
+      "La définition de ce qui compte comme place figure dans le protocole",
+      "Ce relevé est effectué par les agents en tournée, sans campagne dédiée"]],
+   file:["La file d'envoi","Rien n'est perdu. Un relevé enregistré reste dans la file jusqu'à sa transmission effective, et l'application le signale à chaque ouverture tant que la file n'est pas vide.",
+     ["L'envoi reprend automatiquement au retour du réseau",
+      "Aucune donnée sensible n'est conservée après synchronisation",
+      "Chaque relevé porte son collecteur et sa catégorie"]]
+  }[ecran];
+
+  $("#notes").innerHTML=`
+    <h2>${N[0]}</h2>
+    <p class="s">Écran de la maquette, avec ce qu'il doit garantir.</p>
+    <div class="carte">
+      <h3>Ce que cet écran garantit</h3>
+      <p>${N[1]}</p>
+      <ul>${N[2].map(l=>`<li>${l}</li>`).join("")}</ul>
+    </div>
+    <div class="carte">
+      <h3>Profil affiché</h3>
+      <p><b>${P.n}</b><br>${P.terminal}<br>Habilitation : ${P.habilitation}</p>
+      <p style="margin-top:8px">${P.validation}</p>
+    </div>
+    <div class="carte">
+      <h3>Exigences communes aux trois profils</h3>
+      <ul>
+        <li>Fonctionnement intégral sans réseau, file d'envoi visible</li>
+        <li>Référentiel embarqué, rattachement obligatoire</li>
+        <li>Installation sur appareil personnel possible, sans dépendance à un matériel</li>
+        <li>Aucune donnée conservée sur l'appareil après synchronisation</li>
+        <li>Chaque relevé porte son collecteur et sa catégorie</li>
+      </ul>
+      <p style="margin-top:9px">
+        <span class="tg">Livrable 3</span><span class="tg">volet fonctionnel</span>
+      </p>
+    </div>`;
+}
+
+$$(".ch[data-p]").forEach(b=>b.onclick=()=>setProfil(b.dataset.p));
+$$(".ch[data-e]").forEach(b=>b.onclick=()=>aller(b.dataset.e));
+setInterval(()=>{
+  const d=new Date();
+  $("#heure").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+},1000);
+rendre();
+</script>
+
+<div id="nav-demo" style="position:fixed;left:14px;bottom:14px;z-index:901;background:#262626;color:#fff;border-radius:4px;padding:8px 10px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-family:system-ui,sans-serif">
+  <span style="color:#93A29B;margin-right:8px">Maquettes</span>
+  <a href="./index.html" style="color:#fff;text-decoration:none;padding:3px 8px;border-radius:3px;background:#3a3a3a">Portail</a>
+  <a href="./mobile.html" style="color:#fff;text-decoration:none;padding:3px 8px;border-radius:3px;background:#3B7A3F;margin-left:4px">Mobile</a>
+</div>
+</body>
+</html>
