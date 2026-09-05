@@ -56,10 +56,35 @@ dessiné à partir de fond-carte.js. Limite connue : Natural Earth est
 une donnée à petite échelle, le fond reste sobre au zoom des villes.
 Licences : Leaflet BSD-2-Clause, polices SIL Open Font License.
 
-═══ Avant mise en ligne ═══
+═══ Bandeau d'ouverture : trois photographies ═══
 
-- Créditer la photographie du bandeau d'ouverture, ou la remplacer.
-- Vérifier que le crédit « Échangeur de l'Est, Ouagadougou » correspond
-  bien à l'ouvrage photographié.
-- Les valeurs affichées sont simulées : le rappeler à chaque
-  présentation publique.
+Les trois slides portent désormais des photographies :
+  slide 1  img/hero-echangeur-ouaga.jpg   échangeur routier, vue aérienne
+  slide 2  img/hero-monument.jpg          Monument aux Martyrs, deux-roues
+  slide 3  img/hero-corridor.jpg          corridor routier interurbain
+
+Formule du slide 3 corrigée :
+  « Ce qui se construit demain se mesure aujourd'hui »
+
+═══ Avant mise en ligne — points bloquants ═══
+
+1. RÉSOLUTION INSUFFISANTE
+   hero-echangeur-ouaga.jpg fait 375 x 178 pixels et hero-monument.jpg
+   640 x 480. Le bandeau occupe toute la largeur de l'écran : ces
+   fichiers seront visiblement flous sur un ordinateur. Il faut des
+   versions d'au moins 1600 pixels de large.
+
+2. ORIGINE DES IMAGES À ÉTABLIR
+   La photographie du corridor (hero-corridor.jpg) porte un filigrane
+   et ne présente pas les caractéristiques d'un axe burkinabè. Elle est
+   créditée « origine à vérifier » : à remplacer ou à documenter avant
+   toute mise en ligne. Un livrable d'étude ne peut pas illustrer le
+   Burkina Faso avec l'infrastructure d'un autre pays.
+
+3. DROITS ET CRÉDITS
+   Les trois crédits portent la mention « photographie à créditer ».
+   Renseigner l'auteur et la licence de chaque image, ou les remplacer
+   par des prises de vue dont le groupement détient les droits.
+
+4. Les valeurs affichées sont simulées : le rappeler à chaque
+   présentation publique.
